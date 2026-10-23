@@ -3,8 +3,8 @@
 Every airfoil is stored as an (n, 2) array of ``(x/c, y/c)`` in Selig order: trailing
 edge, over the upper surface to the leading edge, and back along the lower surface.
 :func:`normalize` puts the leading edge at (0, 0) and the chord at 1, and
-:class:`Surfaces` turns a coordinate loop into upper and lower surface functions of
-``x/c`` so that root and tip sections can be sampled at matching stations.
+:class:`Surfaces` turns a coordinate loop into smooth upper and lower surface
+functions of ``x/c`` so that root and tip sections can be sampled at matching stations.
 """
 
 from __future__ import annotations
@@ -149,12 +149,22 @@ def normalize(coords: np.ndarray) -> np.ndarray:
 
 @dataclass
 class Surfaces:
-    """Upper and lower surfaces of a normalized airfoil as functions of ``x/c``."""
+    """Upper and lower surfaces of a normalized airfoil as smooth functions of ``x/c``.
+
+    Each surface is an Akima spline through the file's points in ``u = sqrt(x/c)``.
+    Near the round leading edge ``y`` grows like ``sqrt(x)``, which no polynomial in
+    ``x`` can follow, but it is smooth in ``u``. So the nose stays round between
+    sparse data points instead of becoming a sharp corner.
+    """
 
     x_upper: np.ndarray
     y_upper: np.ndarray
     x_lower: np.ndarray
     y_lower: np.ndarray
+
+    def __post_init__(self):
+        self._upper = _Akima(np.sqrt(self.x_upper), self.y_upper)
+        self._lower = _Akima(np.sqrt(self.x_lower), self.y_lower)
 
     @classmethod
     def from_coords(cls, coords: np.ndarray) -> "Surfaces":
@@ -167,10 +177,10 @@ class Surfaces:
         return cls(xu, yu, xl, yl)
 
     def upper(self, x):
-        return np.interp(x, self.x_upper, self.y_upper)
+        return self._upper(np.sqrt(np.clip(x, 0.0, 1.0)))
 
     def lower(self, x):
-        return np.interp(x, self.x_lower, self.y_lower)
+        return self._lower(np.sqrt(np.clip(x, 0.0, 1.0)))
 
     def thickness(self, x):
         return self.upper(x) - self.lower(x)
@@ -183,22 +193,76 @@ class Surfaces:
 def _monotone(surface: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """Clip a LE -> TE surface to 0 <= x <= 1 with strictly increasing x for interpolation.
 
-    Points that step backwards in x (a blunt leading edge sampled very finely) are
-    dropped. The surface is extended to x = 0 and x = 1 so interpolation never clamps
-    short of the ends.
+    Points that step backwards in x (a blunt leading edge sampled very finely), or that
+    sit within 1e-6 of the previous point, are dropped. The last point is moved to
+    x = 1 if it is close, or the surface is extended flat to x = 1 if it stops short.
     """
-    x, y = surface[:, 0], surface[:, 1]
+    x, y = np.minimum(surface[:, 0], 1.0), surface[:, 1]
     xs, ys = [0.0], [float(y[0])]
     for xi, yi in zip(x[1:], y[1:]):
-        if xi > xs[-1] + 1e-9:
-            xs.append(float(min(xi, 1.0)))
+        if xi > xs[-1] + 1e-6:
+            xs.append(float(xi))
             ys.append(float(yi))
-    if xs[-1] < 1.0:
+    if xs[-1] > 1.0 - 1e-3:
+        xs[-1] = 1.0
+    else:
         xs.append(1.0)
         ys.append(ys[-1])
     return np.array(xs), np.array(ys)
 
 
-def cosine_stations(n: int) -> np.ndarray:
-    """``n`` chord stations from 0 to 1, clustered at both the leading and trailing edges."""
-    return (1.0 - np.cos(np.linspace(0.0, np.pi, n))) / 2.0
+class _Akima:
+    """Akima spline through ``(u, y)``; linear if under 3 points.
+
+    Translated from ``Akima`` in FLOWMath.jl (src/interpolate.jl), with ``delta_x = 0``.
+    The slope at each point is a weighted average of the neighbouring segment slopes.
+    So the curve depends only on nearby points and does not overshoot the way a
+    global cubic spline can.
+    """
+
+    def __init__(self, u: np.ndarray, y: np.ndarray, eps: float = 1e-30):
+        self.u = u
+        n = len(u)
+        self.p = None
+        if n < 3:
+            self.y = y
+            return
+        # segment slopes, with two extrapolated slopes at each end: m[k + 2] is segment k
+        m = np.empty(n + 3)
+        m[2 : n + 1] = np.diff(y) / np.diff(u)
+        m[1] = 2.0 * m[2] - m[3]
+        m[0] = 2.0 * m[1] - m[2]
+        m[n + 1] = 2.0 * m[n] - m[n - 1]
+        m[n + 2] = 2.0 * m[n + 1] - m[n]
+
+        # slope at each point
+        m1, m2, m3, m4 = m[0:n], m[1 : n + 1], m[2 : n + 2], m[3 : n + 3]
+        w1, w2 = np.abs(m4 - m3), np.abs(m2 - m1)
+        flat = (w1 < eps) & (w2 < eps)
+        t = np.where(flat, 0.5 * (m2 + m3), (w1 * m2 + w2 * m3) / np.where(flat, 1.0, w1 + w2))
+
+        # cubic coefficients on each segment
+        dx = np.diff(u)
+        mk = m[2 : n + 1]
+        self.p = (y[:-1], t[:-1], (3.0 * mk - 2.0 * t[:-1] - t[1:]) / dx, (t[:-1] + t[1:] - 2.0 * mk) / dx**2)
+
+    def __call__(self, uq):
+        uq = np.asarray(uq, dtype=float)
+        if self.p is None:
+            return np.interp(uq, self.u, self.y)
+        j = np.clip(np.searchsorted(self.u, uq, side="right") - 1, 0, len(self.u) - 2)
+        d = uq - self.u[j]
+        p0, p1, p2, p3 = (c[j] for c in self.p)
+        return p0 + d * (p1 + d * (p2 + d * p3))
+
+
+def stations(n: int, clustering: float = 1.25) -> np.ndarray:
+    """``n`` chord stations from 0 to 1, clustered at the leading edge.
+
+    A half-cosine, ``x = 1 - cos(pi/2 * t**p)`` for evenly spaced ``t``. With ``p = 1``
+    the spacing along the surface is about even near the nose and widens aft. Larger
+    ``p`` packs more points around the nose. The trailing edge gets no extra points,
+    since the surface is nearly straight there.
+    """
+    t = np.linspace(0.0, 1.0, n)
+    return 1.0 - np.cos(np.pi / 2 * t**clustering)

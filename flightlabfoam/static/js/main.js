@@ -67,6 +67,20 @@ async function openProject(file) {
   } catch (e) { toast(e.message, true); }
 }
 
+// Stop the server. The design is already autosaved in this browser, so nothing is lost.
+async function exitApp() {
+  if (!confirm('Stop FlightLabFoam? Your design stays saved in this browser for next time.')) return;
+  try {
+    await api('/api/shutdown', {});
+  } catch (e) {
+    toast(e.message, true);
+    return;
+  }
+  document.body.replaceChildren(h('div', { class: 'stopped' }, h('div', {},
+    h('h1', {}, 'FlightLabFoam has stopped'),
+    h('p', {}, 'You can close this tab. Run uv run flightlabfoam to start it again.'))));
+}
+
 async function init() {
   try {
     const [defaults, settings, airfoils] = await Promise.all([api('/api/defaults'), api('/api/settings'), api('/api/airfoils')]);
@@ -83,6 +97,7 @@ async function init() {
   $('#side-select').addEventListener('change', e => selectPanel(state.panel, e.target.value));
   $('#status-btn').addEventListener('click', () => $('#checks-list').classList.toggle('hidden'));
   $('#save-btn').addEventListener('click', saveProject);
+  $('#exit-btn').addEventListener('click', exitApp);
   $('#open-input').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (f) openProject(f); });
   $('#new-btn').addEventListener('click', () => {
     if (confirm('Start a new design? Save the current one first if you want to keep it.')) {

@@ -36,10 +36,11 @@ function renderSettings() {
       ['all', 'all four axes together'],
     ], () => m.feed_model, v => { m.feed_model = v; })),
     n('max_feed', 'Maximum feed', 'feed'),
+    n('min_wall_thickness', 'Minimum foam wall', 'len'),
     t('heat_on_code', 'Heat on code'),
     t('heat_off_code', 'Heat off code'),
     h('p', { class: 'hint', style: 'grid-column: 1 / -1' },
-      'The carriage side is seen standing at the entry side of the machine, looking along +X. Check how F is applied with a timed straight move: a 50 mm move at F120 should take 25 s if F is the carriage speed.'),
+      'The minimum foam wall is the thinnest foam allowed between a spar or hole and the skin, or between two of them. The carriage side is seen standing at the entry side of the machine, looking along +X. Check how F is applied with a timed straight move: a 50 mm move at F120 should take 25 s if F is the carriage speed.'),
   );
 }
 

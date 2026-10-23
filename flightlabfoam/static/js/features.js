@@ -18,7 +18,7 @@ function panelsInput(item) {
   return el;
 }
 
-const SURFACES = [['upper', 'Upper'], ['lower', 'Lower']];
+const SURFACES = [['lower', 'Bottom'], ['upper', 'Top']];
 
 function removeButton(list, i) {
   return h('button', { class: 'btn small danger', type: 'button', title: 'Remove', onclick: () => { list.splice(i, 1); changed(true); } }, '✕');
@@ -37,7 +37,8 @@ function featureTable(table, list, columns, emptyText) {
   );
 }
 
-const num = (key, kind) => item => numInput(() => item[key], v => { item[key] = v; }, kind, () => changed());
+// the arrow buttons step by 0.05, which suits both chord fractions and millimetres
+const num = (key, kind) => item => numInput(() => item[key], v => { item[key] = v; }, kind, () => changed(), { step: 0.05 });
 const sel = (key, options) => item => selectInput(options, () => item[key], v => { item[key] = v; }, () => changed(true));
 
 function renderFeatures() {

@@ -19,7 +19,7 @@ Then, from this folder:
 uv run flightlabfoam
 ```
 
-The first run takes a minute to set up. A browser tab opens at `http://127.0.0.1:5150/`. Keep the terminal open while you work, and press `Ctrl-C` in it to stop. Use `--port 8000` for a different port and `--no-open` to skip opening the browser.
+The first run takes a minute to set up. A browser tab opens at `http://127.0.0.1:5150/`. Keep the terminal open while you work. To stop, click **Exit** at the top right of the app, or press `Ctrl-C` in the terminal. Use `--port 8000` for a different port and `--no-open` to skip opening the browser.
 
 Your design autosaves in the browser. Use **Save project** to keep a `.foam.json` file, and **Open** to load one.
 
@@ -28,10 +28,10 @@ Your design autosaves in the browser. Use **Save project** to keep a `.foam.json
 The tabs run left to right in the order you would use them. The bar under the tabs picks the panel and wing half that the views, checks and animation show, and the button at its right says whether that panel is ready to cut. Click the button to see the checks.
 
 - **Load airplane** reads a `.flightlab.json` project saved from the FlightLab workbench. Pick a lifting surface and its stations become panels, with airfoils, chords, sweep and twist carried over. Dihedral is reported but not cut, since each panel is cut flat at its true length. An elevator hinge is loaded with cutting switched off. FlightLab files carry no spar positions.
-- **Wing design** (the default) sets symmetric or one-sided, the number of panels, and a table of sections from root to tip: airfoil (bundled, any NACA 4-digit, or an uploaded `.dat` in Selig or Lednicer format), chord, span position, sweep as a leading-edge offset, and twist. The view underneath switches between the whole wing from above, the selected panel in the machine from above, and the airfoils from the side.
-- **Spars, holes & control surfaces** adds square or U slots and round tubes for spars, round lightening holes, and hinge-line cuts for ailerons and elevators. A hot wire cannot start inside the foam, so tubes and holes are reached through a thin slit from the surface you choose. Positions are fractions of the local chord, so they follow the taper; sizes are the same at both ends. Every feature runs the full length of the panels it applies to.
+- **Wing design** (the default) sets symmetric or one-sided, the number of panels, and a table of sections from root to tip: airfoil (bundled, any NACA 4-digit, or an uploaded `.dat` in Selig or Lednicer format), chord, span position, sweep as a leading-edge offset, and twist. Under the table, set how many points describe each airfoil surface and how tightly they gather at the leading edge; a readout gives the resulting spacing in millimetres. The view underneath switches between the whole wing from above, the selected panel in the machine from above, and the airfoils from the side.
+- **Spars, holes & control surfaces** adds square or U slots and round tubes for spars, round lightening holes, and hinge-line cuts for ailerons and elevators. Every cut enters from the bottom of the wing by default, keeping the top surface clean; each one can be switched to enter from the top. A hot wire cannot start inside the foam, so tubes and holes are reached through a thin slit. Positions are fractions of the local chord, so they follow the taper; sizes are the same at both ends. Every feature runs the full length of the panels it applies to. Features may overlap: a hole or hinge cut whose entry falls inside a spar slot is cut from the slot's floor. Each feature is checked at the root and the tip and gets a warning if it breaks through a skin, intersects another feature, or leaves less foam than the minimum wall thickness (set in the ☰ settings, 2 mm by default) between itself and a skin or another feature. Two overlapping slots, or an entry that lands exactly on a slot wall, can't be cut and are reported as errors.
 - **Block placement** sizes the foam block for each panel (automatically, with a margin, or by hand) and places it: cut-in distance, vertical and span-wise offsets of the panel in the block, and the block's position between the carriages. Centred is the default.
-- **Cutting settings**: whether the file switches the wire heat (off by default), cutting speed and where it is held, exit speed, leading or trailing edge first (trailing by default), kerf offset at the root and tip, minimum trailing-edge thickness, point density, and an optional comment header.
+- **Cutting settings**: whether the file switches the wire heat (off by default), cutting speed and where it is held, exit speed, leading or trailing edge first (trailing by default), kerf offset at the root and tip, minimum trailing-edge thickness, and an optional comment header.
 - **Cutting animation** plays the selected panel's cut: both carriages, the wire between them, the block and the panel, timed from the programmed feeds.
 - **Generate G-code** builds one panel or all of them, left and right halves, shows the checks for each file, and downloads the files singly or as a zip. Files with errors are not offered for download.
 
@@ -79,8 +79,8 @@ print(postprocess.gcode(tp, design, Settings()))
 
 ### How a panel becomes G-code
 
-1. [airfoil.py](flightlabfoam/airfoil.py) loads coordinates (bundled file, NACA 4-digit, or uploaded `.dat`), normalizes them to unit chord with the leading edge at the origin, and splits them into upper and lower surfaces.
-2. [geometry.py](flightlabfoam/geometry.py) builds the root and tip outlines with the same number of points at the same chord fractions. It also places feature boundaries at both ends, thickens the trailing edge, offsets by the kerf, inserts the feature cuts, and applies twist and sweep. Point *i* of the root and point *i* of the tip lie on the same wire line.
+1. [airfoil.py](flightlabfoam/airfoil.py) loads coordinates (bundled file, NACA 4-digit, or uploaded `.dat`), normalizes them to unit chord with the leading edge at the origin, and splits them into upper and lower surfaces. Each surface is an Akima spline (translated from FLOWMath.jl) in √(x/c), which keeps the nose round even where the file has few points there.
+2. [geometry.py](flightlabfoam/geometry.py) builds the root and tip outlines with the same number of points at the same chord fractions. The stations follow a half-cosine, x/c = 1 − cos(π/2 · t^p), which packs points at the leading edge and spends none extra at the trailing edge. It also places feature boundaries at both ends, thickens the trailing edge, offsets by the kerf, inserts the feature cuts, and applies twist and sweep. Point *i* of the root and point *i* of the tip lie on the same wire line.
 3. [toolpath.py](flightlabfoam/toolpath.py) places the panel in its block and between the carriages. It orders the path for the entry edge, extends each wire line to the carriage planes, and computes each move's feed.
 4. [checks.py](flightlabfoam/checks.py) checks the fit in the block and between the carriages, the axis travel, and the feeds.
 5. [postprocess.py](flightlabfoam/postprocess.py) writes the text for a `Dialect`. The first dialect is Mach3 with X/Y and A/Z carriages: `G21 G17 G90`, `G1` moves with four decimals and no spaces, `F` only when it changes, CRLF line endings, and optional heat codes and comments.
@@ -90,6 +90,7 @@ print(postprocess.gcode(tp, design, Settings()))
 | method | path | purpose |
 |---|---|---|
 | GET/PUT | `/api/settings` | units and machine profile, saved to `settings.yaml` |
+| POST | `/api/shutdown` | stop the server (the Exit button) |
 | GET | `/api/defaults` | default design and list items |
 | GET | `/api/airfoils` | bundled airfoil names |
 | POST | `/api/airfoil` | coordinates for a name, or for uploaded `.dat` text |

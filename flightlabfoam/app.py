@@ -42,6 +42,15 @@ def create_app(settings_path: Path | None = None) -> Flask:
     def index():
         return render_template("index.html", version=__version__)
 
+    @app.post("/api/shutdown")
+    def shutdown():
+        """Stop the server; the launcher supplies how (see ``__main__``)."""
+        stop = app.config.get("SHUTDOWN")
+        if stop is None:
+            return jsonify({"error": "this server was not started with the flightlabfoam command; stop it from its terminal"}), 400
+        stop()
+        return jsonify({"ok": True})
+
     @app.get("/api/settings")
     def get_settings():
         return jsonify(load_settings().to_dict())
@@ -197,6 +206,7 @@ def _panel_json(design: Design, settings, panel: int, side: str) -> dict:
         "w_tip": pl.w_tip,
         "w_block": list(pl.w_block),
         "span": tp.ends.span,
+        "spacing": tp.ends.spacing(),
         "checks": checks.check(tp, design, settings),
     }
 

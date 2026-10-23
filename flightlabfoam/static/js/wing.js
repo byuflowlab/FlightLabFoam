@@ -88,7 +88,31 @@ function renderWing() {
       h('td', {}, numInput(() => s.twist, v => { s.twist = v; }, 'deg', () => changed())),
     )),
   );
+  renderPoints();
   drawWingViews();
+}
+
+const CLUSTERING = [['1', 'Light'], ['1.25', 'Medium'], ['1.5', 'Strong']];
+
+// How many points describe each airfoil surface, and how tightly they gather at the nose.
+function renderPoints() {
+  const c = state.design.cut;
+  const count = numInput(() => c.points_per_surface, v => { c.points_per_surface = Math.max(10, Math.min(400, Math.round(v))); },
+    null, () => { count.value = c.points_per_surface; changed(); }, { min: 10, max: 400, step: 1 });
+  const known = CLUSTERING.some(([v]) => +v === c.le_clustering);
+  fill($('#points-form'),
+    field('Points per surface', count),
+    field('Leading-edge clustering', selectInput(
+      known ? CLUSTERING : [...CLUSTERING, [String(c.le_clustering), `Custom (${c.le_clustering})`]],
+      () => String(c.le_clustering), v => { c.le_clustering = +v; }, () => changed())),
+    h('span', { class: 'readout', id: 'spacing-readout' }));
+  showSpacing();
+}
+
+function showSpacing() {
+  const el = $('#spacing-readout');
+  const sp = state.preview && state.preview.panel && state.preview.panel.spacing;
+  if (el) el.textContent = sp ? `Panel ${state.panel + 1}: points ${Units.fmt(sp.nose, 'len', 2)} apart at the nose, at most ${Units.fmt(sp.max, 'len', 1)} apart elsewhere` : '';
 }
 
 function drawWingViews() {
@@ -112,5 +136,5 @@ function initWing() {
     drawWingViews();
   }));
   on('structure', renderWing);
-  on('preview', drawWingViews);
+  on('preview', () => { showSpacing(); drawWingViews(); });
 }

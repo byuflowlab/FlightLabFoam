@@ -68,7 +68,7 @@ def test_square_spar_slot_is_the_same_size_at_both_ends(tapered):
     "feature",
     [
         Spar(kind="u", x_c=0.25, width=6, depth=6),
-        Spar(kind="round", x_c=0.3, diameter=6, surface="lower"),
+        Spar(kind="round", x_c=0.3, diameter=6),
         Hole(x_c=0.55, diameter=6),
         ControlCut(enabled=True, hinge_x_c=0.75),
         ControlCut(enabled=True, hinge_x_c=0.75, gap=4.0),
@@ -94,3 +94,35 @@ def test_overlapping_features_are_rejected(design):
     design.spars = [Spar(x_c=0.3, width=10), Spar(x_c=0.32, width=10)]
     with pytest.raises(ValueError, match="overlap"):
         panel_ends(design, 0)
+
+
+def test_clustering_tightens_the_nose_and_point_count_is_respected(design):
+    design.cut.le_clustering = 1.0
+    light = panel_ends(design, 0)
+    design.cut.le_clustering = 1.5
+    strong = panel_ends(design, 0)
+    assert strong.spacing()["nose"] < light.spacing()["nose"] / 3
+    assert light.spacing()["nose"] < light.spacing()["max"]
+    design.cut.points_per_surface = 120
+    assert len(panel_ends(design, 0).root) == 2 * 120 - 1
+
+
+def test_point_settings_are_validated(design):
+    design.cut.le_clustering = 3.0
+    with pytest.raises(ValueError, match="clustering"):
+        design.validate()
+    design.cut.le_clustering = 1.25
+    design.cut.points_per_surface = 5
+    with pytest.raises(ValueError, match="points per surface"):
+        design.validate()
+
+
+def test_features_enter_from_the_bottom_by_default(design):
+    plain = panel_ends(design, 0)
+    design.spars = [Spar(kind="rect")]
+    design.holes = [Hole(x_c=0.55)]
+    design.control_cuts = [ControlCut(enabled=True)]
+    cut = panel_ends(design, 0)
+    # the upper surface, trailing edge to leading edge, is untouched
+    assert np.allclose(cut.root[: cut.le_index + 1], plain.root[: plain.le_index + 1])
+    assert len(cut.root) > len(plain.root)

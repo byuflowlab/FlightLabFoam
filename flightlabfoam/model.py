@@ -58,16 +58,17 @@ class Block:
 class Spar:
     """A spar cut that runs the length of the panel.
 
-    ``rect`` and ``u`` are open slots cut down from a surface. ``round`` is a tube
-    hole reached through a thin entry slit from that surface.
+    ``rect`` and ``u`` are open slots cut into the wing from ``surface``. ``round`` is
+    a tube hole reached through a thin entry slit from that surface. Every feature
+    enters from the lower surface by default, which keeps the top of the wing clean.
     """
 
     enabled: bool = True
     kind: str = "rect"  # rect | u | round
-    surface: str = "upper"  # upper | lower: the surface the cut enters from
+    surface: str = "lower"  # lower | upper: the surface the cut enters from
     x_c: float = 0.3  # centre as a fraction of the local chord
     width: float = 6.0  # slot width (rect, u)
-    depth: float = 6.0  # slot depth below the surface at the slot centre (rect, u)
+    depth: float = 6.0  # slot depth into the wing from the entry surface, at the slot centre (rect, u)
     diameter: float = 6.0  # tube diameter (round)
     y_offset: float = 0.0  # tube centre above the camber line (round)
     panels: list[int] = field(default_factory=list)  # empty means every panel
@@ -75,7 +76,7 @@ class Spar:
 
 @dataclass
 class Hole:
-    """A round lightening hole reached through a thin entry slit."""
+    """A round lightening hole reached through a thin entry slit from ``surface``."""
 
     enabled: bool = True
     x_c: float = 0.5
@@ -98,7 +99,7 @@ class ControlCut:
     kind: str = "aileron"  # aileron | elevator | flap (a label only)
     hinge_x_c: float = 0.75
     gap: float = 0.0
-    surface: str = "upper"
+    surface: str = "lower"
     panels: list[int] = field(default_factory=list)
 
 
@@ -114,6 +115,7 @@ class CutSettings:
     kerf_tip: float = 0.0  # path offset outside the tip section
     te_min_thickness: float = 0.5  # the trailing edge is thickened to at least this
     points_per_surface: int = 80
+    le_clustering: float = 1.25  # 1 = light, 1.25 = medium, 1.5 = strong; see airfoil.stations
     comment_header: bool = False
 
 
@@ -161,8 +163,10 @@ class Design:
                 )
         if self.cut.feed <= 0 or self.cut.exit_feed <= 0:
             raise ValueError("feed rates must be positive")
-        if self.cut.points_per_surface < 10:
-            raise ValueError("use at least 10 points per surface")
+        if not 10 <= self.cut.points_per_surface <= 400:
+            raise ValueError("use between 10 and 400 points per surface")
+        if not 1.0 <= self.cut.le_clustering <= 2.0:
+            raise ValueError("leading-edge clustering must be between 1 and 2")
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

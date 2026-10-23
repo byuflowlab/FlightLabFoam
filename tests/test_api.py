@@ -83,3 +83,11 @@ def test_import_flightlab(client):
     r = client.post("/api/import/flightlab", json={"text": text, "design": base.to_dict()}).get_json()
     assert len(r["surfaces"]) == 3 and r["design"]["cut"]["feed"] == 99.0
     assert len(r["design"]["sections"]) == 4
+
+
+def test_shutdown_calls_the_launcher_hook(client):
+    assert client.post("/api/shutdown").status_code == 400  # no hook outside the launcher
+    calls = []
+    client.application.config["SHUTDOWN"] = lambda: calls.append(1)
+    assert client.post("/api/shutdown").get_json() == {"ok": True}
+    assert calls == [1]

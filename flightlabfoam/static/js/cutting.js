@@ -29,7 +29,6 @@ function renderCutting() {
     field('Kerf offset at the root', n('kerf_root', 'len', { min: 0 }), 'len'),
     field('Kerf offset at the tip', n('kerf_tip', 'len', { min: 0 }), 'len'),
     field('Minimum trailing-edge thickness', n('te_min_thickness', 'len', { min: 0 }), 'len'),
-    field('Points per surface', n('points_per_surface', 'int', { min: 10, max: 400, step: 1 })),
     checkField('Write a comment header describing the cut', checkInput(() => c.comment_header, v => { c.comment_header = v; }, ch)),
   );
 }

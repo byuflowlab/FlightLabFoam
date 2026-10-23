@@ -34,6 +34,7 @@ class Machine:
     # Confirm with a timed straight move on the real machine.
     feed_model: str = "xy"
     max_feed: float = 600.0  # mm/min; faster moves are flagged
+    min_wall_thickness: float = 2.0  # mm; thinner foam between a feature and a skin or another feature is flagged
     heat_on_code: str = "M3"
     heat_off_code: str = "M5"
 
@@ -67,6 +68,8 @@ class Settings:
             raise ValueError("feed model must be xy, xyz or all")
         if m.travel_horizontal <= 0 or m.travel_vertical <= 0 or m.max_feed <= 0:
             raise ValueError("travel limits and maximum feed must be positive")
+        if m.min_wall_thickness < 0:
+            raise ValueError("the minimum wall thickness cannot be negative")
 
 
 def settings_path() -> Path:

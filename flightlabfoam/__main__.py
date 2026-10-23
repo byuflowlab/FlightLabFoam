@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import socket
 import threading
 import webbrowser
@@ -35,10 +36,17 @@ def main(argv: list[str] | None = None) -> None:
     from .app import create_app
 
     app = create_app(args.settings)
+
+    def shutdown():
+        # give the response time to reach the browser, then end the process
+        print("FlightLabFoam stopped from the browser.")
+        threading.Timer(0.5, os._exit, args=(0,)).start()
+
+    app.config["SHUTDOWN"] = shutdown
     port = _free_port(args.port)
     url = f"http://127.0.0.1:{port}/"
     print(f"FlightLabFoam {__version__} is running at {url}")
-    print("Keep this window open while you use the app. Press Ctrl-C to stop.")
+    print("Keep this window open while you use the app. Stop it with Exit in the app, or Ctrl-C here.")
     if not args.no_open:
         threading.Timer(1.0, webbrowser.open, args=(url,)).start()
     # 127.0.0.1 only: the app has no authentication and must not be reachable from the network

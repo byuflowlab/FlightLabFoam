@@ -18,6 +18,7 @@
     <button class="btn ghost" id="new-btn">New</button>
     <label class="btn ghost" title="Open a saved .foam.json project">Open<input type="file" id="open-input" accept=".json" hidden></label>
     <button class="btn" id="save-btn">Save project</button>
+    <button class="btn ghost" id="exit-btn" title="Stop FlightLabFoam">Exit</button>
   </header>
 
   <nav class="tabs" role="tablist">
@@ -64,6 +65,7 @@
         </div>
         <p class="hint">Sections run from the wing root out to the tip. Each panel spans two neighbouring sections. Sweep is the leading-edge offset, positive aft. Twist is about the leading edge, positive nose up.</p>
         <div class="table-wrap"><table class="grid" id="sections-table"></table></div>
+        <div class="row points-row" id="points-form"></div>
       </div>
       <div class="card view-card">
         <div class="view-tabs" id="wing-view-tabs">
@@ -78,13 +80,13 @@
     <section class="pane" data-pane="features" hidden>
       <div class="card">
         <h2>Spars</h2>
-        <p class="hint">Square and U spars are open slots cut down from a surface. Round spars are tubes, reached through a thin entry slit. Positions are fractions of the local chord, so a spar follows the taper; sizes are the same at both ends.</p>
+        <p class="hint">Cuts on this page enter from the bottom of the wing unless you choose the top, so the top surface stays clean. Square and U spars are open slots cut in from that surface. Round spars are tubes, reached through a thin entry slit. Positions are fractions of the local chord, so a spar follows the taper; sizes are the same at both ends.</p>
         <div class="table-wrap"><table class="grid" id="spars-table"></table></div>
         <button class="btn ghost" id="add-spar">Add spar</button>
       </div>
       <div class="card">
         <h2>Lightening holes</h2>
-        <p class="hint">A hot wire cannot start inside the foam, so each hole is reached through a thin slit from the surface you choose.</p>
+        <p class="hint">A hot wire cannot start inside the foam, so each hole is reached through a thin slit, from the bottom unless you choose the top.</p>
         <div class="table-wrap"><table class="grid" id="holes-table"></table></div>
         <button class="btn ghost" id="add-hole">Add hole</button>
       </div>

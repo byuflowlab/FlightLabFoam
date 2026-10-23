@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FlightLabFoam</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <button class="icon-btn" id="menu-btn" aria-label="Settings" title="Settings">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <h1>FlightLabFoam</h1>
+    <span class="design-name" id="design-name"></span>
+    <div class="spacer"></div>
+    <button class="btn ghost" id="new-btn">New</button>
+    <label class="btn ghost" title="Open a saved .foam.json project">Open<input type="file" id="open-input" accept=".json" hidden></label>
+    <button class="btn" id="save-btn">Save project</button>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="load">Load airplane</button>
+    <button role="tab" data-tab="wing" class="on">Wing design</button>
+    <button role="tab" data-tab="features">Spars, holes &amp; control surfaces</button>
+    <button role="tab" data-tab="block">Block placement</button>
+    <button role="tab" data-tab="cutting">Cutting settings</button>
+    <button role="tab" data-tab="animation">Cutting animation</button>
+    <button role="tab" data-tab="generate">Generate G-code</button>
+  </nav>
+
+  <div class="contextbar" id="contextbar">
+    <label>Panel <select id="panel-select"></select></label>
+    <label id="side-label">Wing half <select id="side-select"></select></label>
+    <span class="panel-facts" id="panel-facts"></span>
+    <div class="spacer"></div>
+    <button class="status" id="status-btn" type="button"></button>
+  </div>
+  <ul class="checks hidden" id="checks-list"></ul>
+
+  <main>
+    <section class="pane" data-pane="load" hidden>
+      <div class="card">
+        <h2>Load an airplane from FlightLab</h2>
+        <p class="hint">Choose a <code>.flightlab.json</code> project saved from the FlightLab workbench, then pick the lifting surface to cut. The surface's stations become panels; airfoils, chords, sweep and twist carry over. An elevator hinge is loaded with cutting switched off. Cutting settings are kept.</p>
+        <label class="btn">Choose .flightlab.json<input type="file" id="flightlab-input" accept=".json" hidden></label>
+        <div id="flightlab-surfaces"></div>
+        <ul id="flightlab-notes" class="notes"></ul>
+      </div>
+    </section>
+
+    <section class="pane" data-pane="wing">
+      <div class="card">
+        <div class="row">
+          <label class="field grow">Design name <input id="name-input" type="text"></label>
+          <label class="field">Wing
+            <select id="symmetric-select">
+              <option value="true">Symmetric (left and right halves)</option>
+              <option value="false">Asymmetric (one half only)</option>
+            </select>
+          </label>
+          <label class="field">Panels <input id="panel-count" type="number" min="1" max="12" step="1"></label>
+        </div>
+        <p class="hint">Sections run from the wing root out to the tip. Each panel spans two neighbouring sections. Sweep is the leading-edge offset, positive aft. Twist is about the leading edge, positive nose up.</p>
+        <div class="table-wrap"><table class="grid" id="sections-table"></table></div>
+      </div>
+      <div class="card view-card">
+        <div class="view-tabs" id="wing-view-tabs">
+          <button data-view="wing" class="on">Whole wing</button>
+          <button data-view="panel">Panel</button>
+          <button data-view="airfoil">Airfoils</button>
+        </div>
+        <div class="view" id="wing-view"></div>
+      </div>
+    </section>
+
+    <section class="pane" data-pane="features" hidden>
+      <div class="card">
+        <h2>Spars</h2>
+        <p class="hint">Square and U spars are open slots cut down from a surface. Round spars are tubes, reached through a thin entry slit. Positions are fractions of the local chord, so a spar follows the taper; sizes are the same at both ends.</p>
+        <div class="table-wrap"><table class="grid" id="spars-table"></table></div>
+        <button class="btn ghost" id="add-spar">Add spar</button>
+      </div>
+      <div class="card">
+        <h2>Lightening holes</h2>
+        <p class="hint">A hot wire cannot start inside the foam, so each hole is reached through a thin slit from the surface you choose.</p>
+        <div class="table-wrap"><table class="grid" id="holes-table"></table></div>
+        <button class="btn ghost" id="add-hole">Add hole</button>
+      </div>
+      <div class="card">
+        <h2>Control surfaces</h2>
+        <p class="hint">Cuts through the wing along the hinge line and back, separating the aileron or elevator. A gap makes the cut a V that opens toward the entry surface, leaving room to deflect. A cut runs the full length of each panel it applies to.</p>
+        <div class="table-wrap"><table class="grid" id="controls-table"></table></div>
+        <button class="btn ghost" id="add-control">Add control-surface cut</button>
+      </div>
+      <div class="card view-card">
+        <div class="view" id="features-view"></div>
+      </div>
+    </section>
+
+    <section class="pane" data-pane="block" hidden>
+      <div class="card">
+        <h2>Foam block for this panel</h2>
+        <div class="form-grid" id="block-form"></div>
+        <p class="hint">Program zero is the bottom edge of the block's entry face: zero the wire there. The cut-in is the foam the wire crosses before it reaches the airfoil. Offsets move the panel from the centred position.</p>
+      </div>
+      <div class="card view-card">
+        <div class="view-tabs" id="block-view-tabs">
+          <button data-view="panel" class="on">Top view</button>
+          <button data-view="airfoil">Side view</button>
+        </div>
+        <div class="view" id="block-view"></div>
+      </div>
+    </section>
+
+    <section class="pane" data-pane="cutting" hidden>
+      <div class="card">
+        <h2>Cutting settings</h2>
+        <div class="form-grid" id="cutting-form"></div>
+        <p class="hint">G-code is always written in millimetres. The feed basis says where the cutting speed is held: on the wing root or tip, or on the faster or slower carriage. On a tapered panel the other end moves slower, so it melts more; give it more kerf.</p>
+      </div>
+    </section>
+
+    <section class="pane" data-pane="animation" hidden>
+      <div class="card">
+        <div class="anim-controls">
+          <button class="btn" id="anim-play">Play</button>
+          <input type="range" id="anim-scrub" min="0" max="1000" value="0">
+          <label>Speed
+            <select id="anim-speed">
+              <option value="1">1×</option><option value="5">5×</option><option value="20" selected>20×</option><option value="60">60×</option>
+            </select>
+          </label>
+          <span class="anim-time" id="anim-time"></span>
+        </div>
+        <canvas id="anim-canvas" width="1100" height="560"></canvas>
+        <p class="hint">The orange line is the wire between the two carriages. The foam block and the panel are drawn between them. The time shown assumes the machine moves exactly at the programmed feeds.</p>
+      </div>
+    </section>
+
+    <section class="pane" data-pane="generate" hidden>
+      <div class="card">
+        <h2>Generate G-code</h2>
+        <div class="row">
+          <label class="field">Panels <select id="gen-panel"></select></label>
+          <label class="field">Wing halves <select id="gen-side"></select></label>
+          <button class="btn" id="gen-btn">Generate</button>
+          <button class="btn ghost" id="gen-zip">Download all as .zip</button>
+        </div>
+        <div id="gen-files"></div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="settings-dialog">
+    <form method="dialog" id="settings-form">
+      <h2>Settings</h2>
+      <div class="form-grid" id="settings-fields"></div>
+      <p class="hint">Saved to <code>settings.yaml</code> in the repository.</p>
+      <div class="row end">
+        <button class="btn ghost" value="cancel">Cancel</button>
+        <button class="btn" id="settings-save" value="save">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/state.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/views.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/load.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/wing.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/features.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/block.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/cutting.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/animation.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/generate.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

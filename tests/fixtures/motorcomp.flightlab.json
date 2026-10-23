@@ -1,0 +1,2167 @@
+{
+  "name": "Motor comparison",
+  "surfaces": [
+    {
+      "name": "Main wing",
+      "orientation": "horizontal",
+      "purpose": "wing",
+      "trim_control": "fixed",
+      "symmetric": true,
+      "stations": [
+        {
+          "x_le": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "chord": 0.38,
+          "twist_deg": 2.0,
+          "airfoil": "naca2412"
+        },
+        {
+          "x_le": 0.0,
+          "y": 0.22,
+          "z": 0.0,
+          "chord": 0.38,
+          "twist_deg": 2.0,
+          "airfoil": "naca2412"
+        },
+        {
+          "x_le": 0.07,
+          "y": 0.58,
+          "z": 0.03,
+          "chord": 0.27,
+          "twist_deg": 0.5,
+          "airfoil": "sd7037"
+        },
+        {
+          "x_le": 0.16,
+          "y": 0.86,
+          "z": 0.07,
+          "chord": 0.16,
+          "twist_deg": -1.5,
+          "airfoil": "sd7037"
+        }
+      ],
+      "control_hinge_fraction": 0.75,
+      "control_min_deg": -25.0,
+      "control_max_deg": 25.0
+    },
+    {
+      "name": "Horizontal tail",
+      "orientation": "horizontal",
+      "purpose": "tail",
+      "trim_control": "whole_surface",
+      "symmetric": true,
+      "stations": [
+        {
+          "x_le": 0.72,
+          "y": 0.0,
+          "z": 0.04,
+          "chord": 0.18,
+          "twist_deg": 0.0,
+          "airfoil": "naca0012"
+        },
+        {
+          "x_le": 0.75,
+          "y": 0.25,
+          "z": 0.04,
+          "chord": 0.11,
+          "twist_deg": 0.0,
+          "airfoil": "naca0012"
+        }
+      ],
+      "control_hinge_fraction": 0.75,
+      "control_min_deg": -25.0,
+      "control_max_deg": 25.0
+    },
+    {
+      "name": "Vertical tail",
+      "orientation": "vertical",
+      "purpose": "fin",
+      "trim_control": "fixed",
+      "symmetric": false,
+      "stations": [
+        {
+          "x_le": 0.68,
+          "y": 0.0,
+          "z": 0.04,
+          "chord": 0.22,
+          "twist_deg": 0.0,
+          "airfoil": "naca0012"
+        },
+        {
+          "x_le": 0.78,
+          "y": 0.0,
+          "z": 0.28,
+          "chord": 0.1,
+          "twist_deg": 0.0,
+          "airfoil": "naca0012"
+        }
+      ],
+      "control_hinge_fraction": 0.75,
+      "control_min_deg": -25.0,
+      "control_max_deg": 25.0
+    }
+  ],
+  "reference": {
+    "mode": "surface",
+    "surface": "Main wing",
+    "surfaces": [],
+    "area": null,
+    "span": null,
+    "chord": null
+  },
+  "bodies": [
+    {
+      "name": "fuselage",
+      "length": 0.9,
+      "width": 0.11,
+      "height": 0.13,
+      "diameter": null,
+      "x_nose": -0.12,
+      "y": 0.0,
+      "z": 0.0,
+      "count": 1,
+      "drag_model": "streamlined_body",
+      "cone_fraction": 0.4
+    }
+  ],
+  "masses": [
+    {
+      "name": "wing structure estimate",
+      "mass": 0.24,
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0,
+      "distributed": "surface_area",
+      "span": null,
+      "attached_to": "Main wing",
+      "density": null,
+      "skin_thickness": null
+    },
+    {
+      "name": "fuselage structure estimate",
+      "mass": 0.18,
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0,
+      "distributed": "body_volume",
+      "span": null,
+      "attached_to": "fuselage",
+      "density": null,
+      "skin_thickness": null
+    },
+    {
+      "name": "payload, avionics, and installation hardware",
+      "mass": 0.176,
+      "x": 0.1,
+      "y": 0.0,
+      "z": 0.0,
+      "distributed": "",
+      "span": null,
+      "attached_to": "",
+      "density": null,
+      "skin_thickness": null
+    }
+  ],
+  "cases": [
+    {
+      "name": "Cruise",
+      "speed": 12.0,
+      "altitude": 1400.0,
+      "load_factor": 1.0,
+      "alpha_deg": 2.0,
+      "interference": 0.05,
+      "protuberance": 0.1,
+      "f_other": 0.0,
+      "cooling": 0.0,
+      "n_crit": 9.0,
+      "xtr_upper": 1.0,
+      "xtr_lower": 1.0
+    },
+    {
+      "name": "Takeoff",
+      "speed": 9.0,
+      "altitude": 1400.0,
+      "load_factor": 1.0,
+      "alpha_deg": 2.0,
+      "interference": 0.05,
+      "protuberance": 0.1,
+      "f_other": 0.0,
+      "cooling": 0.0,
+      "n_crit": 9.0,
+      "xtr_upper": 1.0,
+      "xtr_lower": 1.0
+    },
+    {
+      "name": "Maneuver",
+      "speed": 16.0,
+      "altitude": 1400.0,
+      "load_factor": 3.0,
+      "alpha_deg": 2.0,
+      "interference": 0.05,
+      "protuberance": 0.1,
+      "f_other": 0.0,
+      "cooling": 0.0,
+      "n_crit": 9.0,
+      "xtr_upper": 1.0,
+      "xtr_lower": 1.0
+    }
+  ],
+  "airfoils": {},
+  "propulsion": {
+    "battery": "B3S1300",
+    "state_of_charge": 0.95,
+    "battery_x": 0.02,
+    "battery_y": 0.0,
+    "battery_z": 0.0,
+    "include_component_masses": true,
+    "propulsors": [
+      {
+        "name": "Propulsor 1",
+        "motor": "M1260",
+        "propeller": "P9x47",
+        "esc": "ESC18",
+        "throttle": 0.75,
+        "x": -0.08,
+        "y": 0.0,
+        "z": 0.0,
+        "pitch_deg": 0.0,
+        "yaw_deg": 0.0
+      }
+    ]
+  },
+  "structure": {
+    "surface": "Main wing",
+    "spar_height": 0.03,
+    "allowable_stress": 300000000.0,
+    "ultimate_factor": 1.5,
+    "elastic_modulus": 70000000000.0,
+    "cap_width": 0.02
+  },
+  "motors": {
+    "M1260": {
+      "key": "M1260",
+      "name": "SunnySky 2208",
+      "Kv_rpm": 1260.0,
+      "resistance": 0.122,
+      "current_no_load": 0.4,
+      "current_max": 15.0,
+      "mass": 0.046,
+      "no_load_voltage": 10.0,
+      "cells_min": 2,
+      "cells_max": 4,
+      "provisional": false,
+      "notes": ""
+    },
+    "M1100": {
+      "key": "M1100",
+      "name": "SunnySky 2216 1100",
+      "Kv_rpm": 1100.0,
+      "resistance": 0.072,
+      "current_no_load": 0.9,
+      "current_max": 24.0,
+      "mass": 0.072,
+      "no_load_voltage": 10.0,
+      "cells_min": 2,
+      "cells_max": 4,
+      "provisional": false,
+      "notes": ""
+    },
+    "M1400": {
+      "key": "M1400",
+      "name": "SunnySky 2216 1400",
+      "Kv_rpm": 1400.0,
+      "resistance": 0.055,
+      "current_no_load": 1.3,
+      "current_max": 33.0,
+      "mass": 0.072,
+      "no_load_voltage": 10.0,
+      "cells_min": 2,
+      "cells_max": 4,
+      "provisional": false,
+      "notes": ""
+    },
+    "FL820": {
+      "key": "FL820",
+      "name": "EMAX XA2212-820, 820 Kv (FlightLab catalog)",
+      "Kv_rpm": 820.0,
+      "resistance": 0.2,
+      "current_no_load": 0.6,
+      "current_max": 16.0,
+      "mass": 0.057,
+      "no_load_voltage": 11.1,
+      "cells_min": 2,
+      "cells_max": 3,
+      "provisional": true,
+      "notes": "Kv, mass and current_max are the vendor's published figures for a real, orderable part and should be confirmed against the listing at order time. resistance and current_no_load are ESTIMATES -- vendors in this tier do not publish them -- and must be replaced by the TA thrust-stand measurement when measured course data are available. Lowest Kv here: turns a large propeller slowly, which is the efficient way to make thrust at low speed."
+    },
+    "FL1000": {
+      "key": "FL1000",
+      "name": "generic A2212-13T, 1000 Kv (FlightLab catalog)",
+      "Kv_rpm": 1000.0,
+      "resistance": 0.1,
+      "current_no_load": 0.85,
+      "current_max": 13.0,
+      "mass": 0.05,
+      "no_load_voltage": 11.1,
+      "cells_min": 2,
+      "cells_max": 3,
+      "provisional": true,
+      "notes": "Kv, mass and current_max are the vendor's published figures for a real, orderable part and should be confirmed against the listing at order time. resistance and current_no_load are ESTIMATES -- vendors in this tier do not publish them -- and must be replaced by the TA thrust-stand measurement when measured course data are available. The cheapest and most widely stocked motor of this class, and RC-1's baseline. Note the low current limit."
+    },
+    "FL1250": {
+      "key": "FL1250",
+      "name": "SunnySky X2216-11, 1250 Kv (FlightLab catalog)",
+      "Kv_rpm": 1250.0,
+      "resistance": 0.06,
+      "current_no_load": 1.1,
+      "current_max": 26.0,
+      "mass": 0.068,
+      "no_load_voltage": 11.1,
+      "cells_min": 2,
+      "cells_max": 3,
+      "provisional": true,
+      "notes": "Kv, mass and current_max are the vendor's published figures for a real, orderable part and should be confirmed against the listing at order time. resistance and current_no_load are ESTIMATES -- vendors in this tier do not publish them -- and must be replaced by the TA thrust-stand measurement when measured course data are available. Highest peak efficiency in the catalog, and 18 g heavier than the lightest. Whether that is worth it depends on the mission, which is the point."
+    },
+    "FL1400": {
+      "key": "FL1400",
+      "name": "generic A2212-10T, 1400 Kv (FlightLab catalog)",
+      "Kv_rpm": 1400.0,
+      "resistance": 0.085,
+      "current_no_load": 1.45,
+      "current_max": 15.0,
+      "mass": 0.05,
+      "no_load_voltage": 11.1,
+      "cells_min": 2,
+      "cells_max": 3,
+      "provisional": true,
+      "notes": "Kv, mass and current_max are the vendor's published figures for a real, orderable part and should be confirmed against the listing at order time. resistance and current_no_load are ESTIMATES -- vendors in this tier do not publish them -- and must be replaced by the TA thrust-stand measurement when measured course data are available. Highest Kv and the WORST peak efficiency, because peak efficiency ranks with I0*R/V and this motor's no-load current is high. Students expect the opposite."
+    }
+  },
+  "batteries": {
+    "B2S1300": {
+      "key": "B2S1300",
+      "name": "2S 7.4 V 1300 mAh 45C LiPo",
+      "cells_series": 2,
+      "cells_parallel": 1,
+      "capacity_ah": 1.3,
+      "mass": 0.075,
+      "c_rating": 45.0,
+      "cell_resistance": 0.01,
+      "cell_voltage_nominal": 3.7,
+      "cell_voltage_full": 4.2,
+      "cell_voltage_empty": 3.0,
+      "provisional": true,
+      "notes": "Widely stocked hobby pack. Mass is the vendor figure; cell_resistance is an ESTIMATE to be measured."
+    },
+    "B3S2200": {
+      "key": "B3S2200",
+      "name": "3S 11.1 V 2200 mAh 50C LiPo",
+      "cells_series": 3,
+      "cells_parallel": 1,
+      "capacity_ah": 2.2,
+      "mass": 0.185,
+      "c_rating": 50.0,
+      "cell_resistance": 0.008,
+      "cell_voltage_nominal": 3.7,
+      "cell_voltage_full": 4.2,
+      "cell_voltage_empty": 3.0,
+      "provisional": true,
+      "notes": "70 g heavier than B3S1300 for 69% more energy. Whether that is a good trade is the endurance-versus-mass question, and it depends on the mission. cell_resistance is an ESTIMATE."
+    },
+    "B3S1300": {
+      "key": "B3S1300",
+      "name": "3S 11.1 V 1300 mAh 45C LiPo",
+      "cells_series": 3,
+      "cells_parallel": 1,
+      "capacity_ah": 1.3,
+      "mass": 0.115,
+      "c_rating": 45.0,
+      "cell_resistance": 0.012,
+      "cell_voltage_nominal": 3.7,
+      "cell_voltage_full": 4.2,
+      "cell_voltage_empty": 3.0,
+      "provisional": true,
+      "notes": "RC-1's baseline pack; its 115 g matches the battery row of the RC-1 component mass table. cell_resistance is an ESTIMATE."
+    }
+  },
+  "escs": {
+    "ESC30": {
+      "key": "ESC30",
+      "name": "30 A brushless ESC with 5 V BEC",
+      "current_max": 30.0,
+      "mass": 0.025,
+      "efficiency": 0.95,
+      "provisional": true
+    },
+    "ESC40": {
+      "key": "ESC40",
+      "name": "40 A brushless ESC with 5 V BEC",
+      "current_max": 40.0,
+      "mass": 0.038,
+      "efficiency": 0.96,
+      "provisional": true
+    },
+    "ESC18": {
+      "key": "ESC18",
+      "name": "18 A brushless ESC",
+      "current_max": 18.0,
+      "mass": 0.03,
+      "efficiency": 0.95,
+      "provisional": true
+    }
+  },
+  "propellers": {
+    "P8x6": {
+      "key": "P8x6",
+      "name": "APC 8x6SF",
+      "mass": 0.01,
+      "data": "apce_8x6",
+      "diameter": 0.2032,
+      "pitch": 0.1524,
+      "points": [
+        {
+          "rpm": 4000.0,
+          "J": 0.171,
+          "CT": 0.1373,
+          "CP": 0.0808
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.218,
+          "CT": 0.1321,
+          "CP": 0.08
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.262,
+          "CT": 0.1271,
+          "CP": 0.0794
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.31,
+          "CT": 0.1207,
+          "CP": 0.0783
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.353,
+          "CT": 0.1135,
+          "CP": 0.0763
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.403,
+          "CT": 0.1058,
+          "CP": 0.0743
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.454,
+          "CT": 0.0968,
+          "CP": 0.0713
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.493,
+          "CT": 0.0895,
+          "CP": 0.0685
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.547,
+          "CT": 0.0816,
+          "CP": 0.0656
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.586,
+          "CT": 0.0747,
+          "CP": 0.0626
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.637,
+          "CT": 0.0657,
+          "CP": 0.0583
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.676,
+          "CT": 0.0596,
+          "CP": 0.0553
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.726,
+          "CT": 0.0496,
+          "CP": 0.0501
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.771,
+          "CT": 0.0409,
+          "CP": 0.045
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.816,
+          "CT": 0.0311,
+          "CP": 0.0399
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.863,
+          "CT": 0.0211,
+          "CP": 0.034
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.911,
+          "CT": 0.008,
+          "CP": 0.0267
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.609,
+          "CT": 0.0723,
+          "CP": 0.0625
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.647,
+          "CT": 0.066,
+          "CP": 0.0591
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.69,
+          "CT": 0.058,
+          "CP": 0.0552
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.713,
+          "CT": 0.0546,
+          "CP": 0.0532
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.756,
+          "CT": 0.0459,
+          "CP": 0.0484
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.8,
+          "CT": 0.0372,
+          "CP": 0.0435
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.833,
+          "CT": 0.03,
+          "CP": 0.0394
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.869,
+          "CT": 0.0211,
+          "CP": 0.0342
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.907,
+          "CT": 0.0121,
+          "CP": 0.0287
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.943,
+          "CT": 0.0026,
+          "CP": 0.0229
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.137,
+          "CT": 0.1426,
+          "CP": 0.0835
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.173,
+          "CT": 0.14,
+          "CP": 0.0834
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.207,
+          "CT": 0.1368,
+          "CP": 0.0831
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.245,
+          "CT": 0.1329,
+          "CP": 0.0828
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.28,
+          "CT": 0.1288,
+          "CP": 0.0823
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.319,
+          "CT": 0.1232,
+          "CP": 0.0811
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.357,
+          "CT": 0.1173,
+          "CP": 0.0797
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.397,
+          "CT": 0.1105,
+          "CP": 0.0776
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.432,
+          "CT": 0.1046,
+          "CP": 0.0758
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.466,
+          "CT": 0.0986,
+          "CP": 0.0737
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.508,
+          "CT": 0.0908,
+          "CP": 0.0706
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.539,
+          "CT": 0.0848,
+          "CP": 0.068
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.579,
+          "CT": 0.0776,
+          "CP": 0.0649
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.61,
+          "CT": 0.0725,
+          "CP": 0.0627
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.653,
+          "CT": 0.0652,
+          "CP": 0.059
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.685,
+          "CT": 0.059,
+          "CP": 0.0557
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.726,
+          "CT": 0.052,
+          "CP": 0.0519
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.507,
+          "CT": 0.097,
+          "CP": 0.0752
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.536,
+          "CT": 0.0918,
+          "CP": 0.073
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.567,
+          "CT": 0.0857,
+          "CP": 0.0702
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.595,
+          "CT": 0.0806,
+          "CP": 0.0678
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.629,
+          "CT": 0.0743,
+          "CP": 0.0648
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.656,
+          "CT": 0.0696,
+          "CP": 0.0625
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.69,
+          "CT": 0.0633,
+          "CP": 0.0593
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.72,
+          "CT": 0.0579,
+          "CP": 0.0564
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.755,
+          "CT": 0.051,
+          "CP": 0.0525
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.78,
+          "CT": 0.046,
+          "CP": 0.0497
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.818,
+          "CT": 0.038,
+          "CP": 0.045
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.84,
+          "CT": 0.0326,
+          "CP": 0.0421
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.877,
+          "CT": 0.023,
+          "CP": 0.0367
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.906,
+          "CT": 0.0152,
+          "CP": 0.0322
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.938,
+          "CT": 0.0064,
+          "CP": 0.0274
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.111,
+          "CT": 0.1497,
+          "CP": 0.0874
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.141,
+          "CT": 0.1474,
+          "CP": 0.087
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.172,
+          "CT": 0.1449,
+          "CP": 0.0867
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.203,
+          "CT": 0.1425,
+          "CP": 0.0866
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.234,
+          "CT": 0.1395,
+          "CP": 0.0864
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.265,
+          "CT": 0.1366,
+          "CP": 0.0862
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.296,
+          "CT": 0.1332,
+          "CP": 0.0859
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.328,
+          "CT": 0.129,
+          "CP": 0.085
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.358,
+          "CT": 0.1247,
+          "CP": 0.0842
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.39,
+          "CT": 0.1191,
+          "CP": 0.0825
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.42,
+          "CT": 0.1136,
+          "CP": 0.0807
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.45,
+          "CT": 0.1083,
+          "CP": 0.0788
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.478,
+          "CT": 0.103,
+          "CP": 0.0769
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.511,
+          "CT": 0.0964,
+          "CP": 0.0743
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.535,
+          "CT": 0.0919,
+          "CP": 0.0723
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.569,
+          "CT": 0.0852,
+          "CP": 0.0692
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.596,
+          "CT": 0.0802,
+          "CP": 0.0669
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.459,
+          "CT": 0.1112,
+          "CP": 0.0816
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.486,
+          "CT": 0.106,
+          "CP": 0.0795
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.513,
+          "CT": 0.1009,
+          "CP": 0.0774
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.544,
+          "CT": 0.0947,
+          "CP": 0.0748
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.57,
+          "CT": 0.0895,
+          "CP": 0.0724
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.596,
+          "CT": 0.0844,
+          "CP": 0.07
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.63,
+          "CT": 0.0778,
+          "CP": 0.0668
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.655,
+          "CT": 0.0732,
+          "CP": 0.0647
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.682,
+          "CT": 0.0683,
+          "CP": 0.0621
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.714,
+          "CT": 0.062,
+          "CP": 0.0589
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.738,
+          "CT": 0.0575,
+          "CP": 0.0566
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.763,
+          "CT": 0.0522,
+          "CP": 0.0537
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.796,
+          "CT": 0.0446,
+          "CP": 0.0495
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.82,
+          "CT": 0.0385,
+          "CP": 0.0465
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.851,
+          "CT": 0.0314,
+          "CP": 0.0424
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.873,
+          "CT": 0.026,
+          "CP": 0.0393
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.904,
+          "CT": 0.0169,
+          "CP": 0.0344
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.933,
+          "CT": 0.0089,
+          "CP": 0.0297
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.958,
+          "CT": 0.0019,
+          "CP": 0.0257
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.101,
+          "CT": 0.1537,
+          "CP": 0.0905
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.134,
+          "CT": 0.1513,
+          "CP": 0.0899
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.157,
+          "CT": 0.1496,
+          "CP": 0.0897
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.182,
+          "CT": 0.1474,
+          "CP": 0.0894
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.213,
+          "CT": 0.145,
+          "CP": 0.0891
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.243,
+          "CT": 0.1421,
+          "CP": 0.0888
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.27,
+          "CT": 0.1395,
+          "CP": 0.0886
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.297,
+          "CT": 0.1367,
+          "CP": 0.0883
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.325,
+          "CT": 0.1334,
+          "CP": 0.0879
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.353,
+          "CT": 0.1296,
+          "CP": 0.0871
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.379,
+          "CT": 0.1257,
+          "CP": 0.0862
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.406,
+          "CT": 0.1207,
+          "CP": 0.0848
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.434,
+          "CT": 0.1163,
+          "CP": 0.0835
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.463,
+          "CT": 0.1097,
+          "CP": 0.0808
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.491,
+          "CT": 0.1047,
+          "CP": 0.0788
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.517,
+          "CT": 0.0995,
+          "CP": 0.0766
+        },
+        {
+          "rpm": 6600.0,
+          "J": 0.546,
+          "CT": 0.0936,
+          "CP": 0.0741
+        }
+      ],
+      "notes": "performance measured; mass is a placeholder"
+    },
+    "P9x47": {
+      "key": "P9x47",
+      "name": "APC 9x4.7SF",
+      "mass": 0.012,
+      "data": "apce_9x47",
+      "diameter": 0.2286,
+      "pitch": 0.11938,
+      "points": [
+        {
+          "rpm": 4000.0,
+          "J": 0.162,
+          "CT": 0.098,
+          "CP": 0.0465
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.2,
+          "CT": 0.0924,
+          "CP": 0.0455
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.243,
+          "CT": 0.0865,
+          "CP": 0.0447
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.283,
+          "CT": 0.0805,
+          "CP": 0.0436
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.33,
+          "CT": 0.0726,
+          "CP": 0.0421
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.366,
+          "CT": 0.0661,
+          "CP": 0.0407
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.412,
+          "CT": 0.0572,
+          "CP": 0.0385
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.441,
+          "CT": 0.0515,
+          "CP": 0.0369
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.487,
+          "CT": 0.0415,
+          "CP": 0.0339
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.535,
+          "CT": 0.0306,
+          "CP": 0.0307
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.574,
+          "CT": 0.0209,
+          "CP": 0.0275
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.599,
+          "CT": 0.0142,
+          "CP": 0.0254
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.646,
+          "CT": 0.0013,
+          "CP": 0.0212
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.128,
+          "CT": 0.1033,
+          "CP": 0.0467
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.16,
+          "CT": 0.0983,
+          "CP": 0.0459
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.192,
+          "CT": 0.0939,
+          "CP": 0.0454
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.228,
+          "CT": 0.0886,
+          "CP": 0.0444
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.259,
+          "CT": 0.0838,
+          "CP": 0.0436
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.295,
+          "CT": 0.0782,
+          "CP": 0.0427
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.326,
+          "CT": 0.0727,
+          "CP": 0.0416
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.361,
+          "CT": 0.0663,
+          "CP": 0.0402
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.387,
+          "CT": 0.0613,
+          "CP": 0.0389
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.421,
+          "CT": 0.0543,
+          "CP": 0.037
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.459,
+          "CT": 0.0462,
+          "CP": 0.0348
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.486,
+          "CT": 0.04,
+          "CP": 0.033
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.518,
+          "CT": 0.0325,
+          "CP": 0.0307
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.547,
+          "CT": 0.0252,
+          "CP": 0.0286
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.584,
+          "CT": 0.0153,
+          "CP": 0.0256
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.615,
+          "CT": 0.007,
+          "CP": 0.0228
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.455,
+          "CT": 0.0445,
+          "CP": 0.0337
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.483,
+          "CT": 0.038,
+          "CP": 0.0319
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.509,
+          "CT": 0.0316,
+          "CP": 0.0301
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.54,
+          "CT": 0.0237,
+          "CP": 0.0278
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.566,
+          "CT": 0.0168,
+          "CP": 0.0257
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.593,
+          "CT": 0.0094,
+          "CP": 0.0235
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.615,
+          "CT": 0.0033,
+          "CP": 0.0216
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.105,
+          "CT": 0.1065,
+          "CP": 0.0466
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.134,
+          "CT": 0.1023,
+          "CP": 0.0461
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.16,
+          "CT": 0.0985,
+          "CP": 0.0455
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.188,
+          "CT": 0.0943,
+          "CP": 0.0448
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.216,
+          "CT": 0.0899,
+          "CP": 0.0441
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.243,
+          "CT": 0.0857,
+          "CP": 0.0434
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.27,
+          "CT": 0.0813,
+          "CP": 0.0426
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.295,
+          "CT": 0.0771,
+          "CP": 0.0419
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.321,
+          "CT": 0.0726,
+          "CP": 0.041
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.352,
+          "CT": 0.0667,
+          "CP": 0.0397
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.382,
+          "CT": 0.0607,
+          "CP": 0.0381
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.404,
+          "CT": 0.0564,
+          "CP": 0.0371
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.432,
+          "CT": 0.0501,
+          "CP": 0.0353
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.457,
+          "CT": 0.0446,
+          "CP": 0.0337
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.481,
+          "CT": 0.0387,
+          "CP": 0.0321
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.512,
+          "CT": 0.0308,
+          "CP": 0.0299
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.539,
+          "CT": 0.0239,
+          "CP": 0.0279
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.092,
+          "CT": 0.1076,
+          "CP": 0.0462
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.119,
+          "CT": 0.1041,
+          "CP": 0.0459
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.141,
+          "CT": 0.1005,
+          "CP": 0.0451
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.168,
+          "CT": 0.0969,
+          "CP": 0.0448
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.191,
+          "CT": 0.0933,
+          "CP": 0.044
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.216,
+          "CT": 0.0893,
+          "CP": 0.0433
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.239,
+          "CT": 0.0859,
+          "CP": 0.0429
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.262,
+          "CT": 0.082,
+          "CP": 0.0424
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.286,
+          "CT": 0.0776,
+          "CP": 0.0415
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.308,
+          "CT": 0.0733,
+          "CP": 0.0405
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.332,
+          "CT": 0.069,
+          "CP": 0.0396
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.355,
+          "CT": 0.0644,
+          "CP": 0.0384
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.378,
+          "CT": 0.0599,
+          "CP": 0.0373
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.405,
+          "CT": 0.054,
+          "CP": 0.0358
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.427,
+          "CT": 0.0489,
+          "CP": 0.0344
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.451,
+          "CT": 0.0435,
+          "CP": 0.033
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.474,
+          "CT": 0.0379,
+          "CP": 0.0315
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.402,
+          "CT": 0.0548,
+          "CP": 0.0361
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.428,
+          "CT": 0.0489,
+          "CP": 0.0345
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.453,
+          "CT": 0.0428,
+          "CP": 0.0328
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.475,
+          "CT": 0.0376,
+          "CP": 0.0314
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.497,
+          "CT": 0.0321,
+          "CP": 0.0299
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.52,
+          "CT": 0.0258,
+          "CP": 0.0281
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.547,
+          "CT": 0.0191,
+          "CP": 0.0262
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.568,
+          "CT": 0.0134,
+          "CP": 0.0245
+        },
+        {
+          "rpm": 6800.0,
+          "J": 0.592,
+          "CT": 0.0067,
+          "CP": 0.0226
+        }
+      ],
+      "notes": "performance measured; mass is a placeholder"
+    },
+    "P10x47": {
+      "key": "P10x47",
+      "name": "APC 10x4.7SF",
+      "mass": 0.014,
+      "data": "apce_10x47",
+      "diameter": 0.254,
+      "pitch": 0.11938,
+      "points": [
+        {
+          "rpm": 4000.0,
+          "J": 0.142,
+          "CT": 0.0994,
+          "CP": 0.0451
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.177,
+          "CT": 0.0944,
+          "CP": 0.0446
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.216,
+          "CT": 0.0885,
+          "CP": 0.0436
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.255,
+          "CT": 0.0829,
+          "CP": 0.0427
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.289,
+          "CT": 0.077,
+          "CP": 0.0414
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.325,
+          "CT": 0.0719,
+          "CP": 0.0407
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.361,
+          "CT": 0.0652,
+          "CP": 0.0392
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.399,
+          "CT": 0.0582,
+          "CP": 0.0375
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.438,
+          "CT": 0.0502,
+          "CP": 0.0352
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.468,
+          "CT": 0.0441,
+          "CP": 0.0335
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.51,
+          "CT": 0.0343,
+          "CP": 0.0308
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.534,
+          "CT": 0.0288,
+          "CP": 0.0292
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.577,
+          "CT": 0.0178,
+          "CP": 0.0258
+        },
+        {
+          "rpm": 4000.0,
+          "J": 0.612,
+          "CT": 0.0083,
+          "CP": 0.0228
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.487,
+          "CT": 0.0425,
+          "CP": 0.0334
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.52,
+          "CT": 0.0347,
+          "CP": 0.0311
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.547,
+          "CT": 0.0278,
+          "CP": 0.029
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.575,
+          "CT": 0.0204,
+          "CP": 0.0267
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.604,
+          "CT": 0.0125,
+          "CP": 0.0242
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.636,
+          "CT": 0.004,
+          "CP": 0.0215
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.115,
+          "CT": 0.1077,
+          "CP": 0.0476
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.143,
+          "CT": 0.1038,
+          "CP": 0.0472
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.172,
+          "CT": 0.0993,
+          "CP": 0.0465
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.199,
+          "CT": 0.0953,
+          "CP": 0.0459
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.231,
+          "CT": 0.0908,
+          "CP": 0.0452
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.262,
+          "CT": 0.0856,
+          "CP": 0.0442
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.289,
+          "CT": 0.0811,
+          "CP": 0.0433
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.318,
+          "CT": 0.0766,
+          "CP": 0.0426
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.349,
+          "CT": 0.0709,
+          "CP": 0.0413
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.376,
+          "CT": 0.066,
+          "CP": 0.0401
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.408,
+          "CT": 0.0597,
+          "CP": 0.0383
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.432,
+          "CT": 0.0549,
+          "CP": 0.037
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.46,
+          "CT": 0.0486,
+          "CP": 0.0351
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.487,
+          "CT": 0.0428,
+          "CP": 0.0334
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.519,
+          "CT": 0.0352,
+          "CP": 0.0312
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.547,
+          "CT": 0.028,
+          "CP": 0.0291
+        },
+        {
+          "rpm": 5000.0,
+          "J": 0.576,
+          "CT": 0.0206,
+          "CP": 0.0268
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.408,
+          "CT": 0.0624,
+          "CP": 0.0397
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.432,
+          "CT": 0.0576,
+          "CP": 0.0383
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.458,
+          "CT": 0.0519,
+          "CP": 0.0366
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.48,
+          "CT": 0.0471,
+          "CP": 0.0351
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.507,
+          "CT": 0.0405,
+          "CP": 0.0331
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.528,
+          "CT": 0.0354,
+          "CP": 0.0315
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.551,
+          "CT": 0.0296,
+          "CP": 0.0297
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.574,
+          "CT": 0.0235,
+          "CP": 0.0279
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.601,
+          "CT": 0.016,
+          "CP": 0.0254
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.623,
+          "CT": 0.01,
+          "CP": 0.0234
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.652,
+          "CT": 0.0017,
+          "CP": 0.0207
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.095,
+          "CT": 0.1171,
+          "CP": 0.0511
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.121,
+          "CT": 0.1133,
+          "CP": 0.0507
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.146,
+          "CT": 0.1087,
+          "CP": 0.0498
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.169,
+          "CT": 0.1048,
+          "CP": 0.0491
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.192,
+          "CT": 0.1009,
+          "CP": 0.0484
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.217,
+          "CT": 0.0965,
+          "CP": 0.0475
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.24,
+          "CT": 0.0932,
+          "CP": 0.0469
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.267,
+          "CT": 0.0884,
+          "CP": 0.0459
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.29,
+          "CT": 0.0847,
+          "CP": 0.0452
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.315,
+          "CT": 0.0805,
+          "CP": 0.0444
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.334,
+          "CT": 0.0773,
+          "CP": 0.0438
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.358,
+          "CT": 0.0728,
+          "CP": 0.0427
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.38,
+          "CT": 0.0685,
+          "CP": 0.0416
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.407,
+          "CT": 0.0629,
+          "CP": 0.0399
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.431,
+          "CT": 0.0581,
+          "CP": 0.0385
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.453,
+          "CT": 0.0532,
+          "CP": 0.037
+        },
+        {
+          "rpm": 6000.0,
+          "J": 0.477,
+          "CT": 0.048,
+          "CP": 0.0354
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.089,
+          "CT": 0.1201,
+          "CP": 0.0523
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.112,
+          "CT": 0.1171,
+          "CP": 0.0522
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.134,
+          "CT": 0.1129,
+          "CP": 0.0512
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.155,
+          "CT": 0.1101,
+          "CP": 0.0511
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.176,
+          "CT": 0.1059,
+          "CP": 0.05
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.199,
+          "CT": 0.1019,
+          "CP": 0.0493
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.225,
+          "CT": 0.0974,
+          "CP": 0.0483
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.246,
+          "CT": 0.0935,
+          "CP": 0.0475
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.266,
+          "CT": 0.0895,
+          "CP": 0.0465
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.287,
+          "CT": 0.0865,
+          "CP": 0.046
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.308,
+          "CT": 0.0833,
+          "CP": 0.0454
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.332,
+          "CT": 0.0787,
+          "CP": 0.0444
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.357,
+          "CT": 0.0743,
+          "CP": 0.0434
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.378,
+          "CT": 0.0704,
+          "CP": 0.0424
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.395,
+          "CT": 0.0669,
+          "CP": 0.0414
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.42,
+          "CT": 0.0616,
+          "CP": 0.0398
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.445,
+          "CT": 0.0562,
+          "CP": 0.0381
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.378,
+          "CT": 0.0698,
+          "CP": 0.0422
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.4,
+          "CT": 0.0654,
+          "CP": 0.0409
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.42,
+          "CT": 0.0616,
+          "CP": 0.0398
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.44,
+          "CT": 0.057,
+          "CP": 0.0383
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.465,
+          "CT": 0.0517,
+          "CP": 0.0367
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.486,
+          "CT": 0.0469,
+          "CP": 0.0351
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.507,
+          "CT": 0.042,
+          "CP": 0.0336
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.531,
+          "CT": 0.0359,
+          "CP": 0.0318
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.551,
+          "CT": 0.0306,
+          "CP": 0.0302
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.579,
+          "CT": 0.0229,
+          "CP": 0.0277
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.599,
+          "CT": 0.0176,
+          "CP": 0.026
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.618,
+          "CT": 0.012,
+          "CP": 0.0242
+        },
+        {
+          "rpm": 6500.0,
+          "J": 0.646,
+          "CT": 0.0044,
+          "CP": 0.0217
+        }
+      ],
+      "notes": "performance measured; mass is a placeholder. RC-1's baseline propeller, and the one on the thrust stand."
+    }
+  },
+  "notes": "Compare the motors for the course. ",
+  "format_version": 3
+}

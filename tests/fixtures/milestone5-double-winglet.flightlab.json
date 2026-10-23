@@ -1,0 +1,806 @@
+{
+  "name": "FVD_Project",
+  "surfaces": [
+    {
+      "name": "Main wing",
+      "trim_control": "elevator",
+      "symmetric": true,
+      "stations": [
+        {
+          "x_le": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "chord": 0.5,
+          "twist_deg": 0.0,
+          "airfoil": "naca2420"
+        },
+        {
+          "x_le": 0.12,
+          "y": 0.2,
+          "z": 0.0,
+          "chord": 0.46,
+          "twist_deg": 0.0,
+          "airfoil": "mh45"
+        },
+        {
+          "x_le": 0.5,
+          "y": 0.7,
+          "z": 0.0,
+          "chord": 0.3,
+          "twist_deg": -4.0,
+          "airfoil": "mh45"
+        }
+      ],
+      "control_hinge_fraction": 0.75,
+      "control_min_deg": -25.0,
+      "control_max_deg": 25.0
+    },
+    {
+      "name": "Winglet down",
+      "trim_control": "fixed",
+      "symmetric": true,
+      "stations": [
+        {
+          "x_le": 0.7,
+          "y": 0.7,
+          "z": -0.2,
+          "chord": 0.1,
+          "twist_deg": 0.0,
+          "airfoil": "naca0009"
+        },
+        {
+          "x_le": 0.5,
+          "y": 0.7,
+          "z": 0.0,
+          "chord": 0.3,
+          "twist_deg": 0.0,
+          "airfoil": "naca0009"
+        }
+      ],
+      "control_hinge_fraction": 0.75,
+      "control_min_deg": -25.0,
+      "control_max_deg": 25.0
+    },
+    {
+      "name": "Winglet up",
+      "trim_control": "fixed",
+      "symmetric": true,
+      "stations": [
+        {
+          "x_le": 0.7,
+          "y": 0.7,
+          "z": 0.2,
+          "chord": 0.1,
+          "twist_deg": 0.0,
+          "airfoil": "naca0009"
+        },
+        {
+          "x_le": 0.5,
+          "y": 0.7,
+          "z": 0.0,
+          "chord": 0.3,
+          "twist_deg": 0.0,
+          "airfoil": "naca0009"
+        }
+      ],
+      "control_hinge_fraction": 0.75,
+      "control_min_deg": -25.0,
+      "control_max_deg": 25.0
+    }
+  ],
+  "reference": {
+    "mode": "surface",
+    "surface": "Main wing",
+    "surfaces": [],
+    "area": null,
+    "span": null,
+    "chord": null
+  },
+  "bodies": [],
+  "masses": [
+    {
+      "name": "wing structure estimate",
+      "mass": 1.25,
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0,
+      "distributed": "surface_area",
+      "span": null,
+      "attached_to": "Main wing",
+      "density": null,
+      "skin_thickness": null
+    },
+    {
+      "name": "PT Mass",
+      "mass": 0.65,
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.1,
+      "distributed": "point",
+      "span": null,
+      "attached_to": "",
+      "density": null,
+      "skin_thickness": null
+    }
+  ],
+  "cases": [
+    {
+      "name": "Cruise",
+      "speed": 18.0,
+      "altitude": 1400.0,
+      "load_factor": 1.0,
+      "alpha_deg": 2.0,
+      "interference": 0.05,
+      "protuberance": 0.1,
+      "f_other": 0.0,
+      "n_crit": 9.0,
+      "xtr_upper": 1.0,
+      "xtr_lower": 1.0
+    },
+    {
+      "name": "Takeoff",
+      "speed": 18.0,
+      "altitude": 1400.0,
+      "load_factor": 1.0,
+      "alpha_deg": 2.0,
+      "interference": 0.05,
+      "protuberance": 0.1,
+      "f_other": 0.0,
+      "n_crit": 9.0,
+      "xtr_upper": 1.0,
+      "xtr_lower": 1.0
+    },
+    {
+      "name": "Maneuver",
+      "speed": 24.0,
+      "altitude": 1400.0,
+      "load_factor": 3.0,
+      "alpha_deg": 2.0,
+      "interference": 0.05,
+      "protuberance": 0.1,
+      "f_other": 0.0,
+      "n_crit": 9.0,
+      "xtr_upper": 1.0,
+      "xtr_lower": 1.0
+    }
+  ],
+  "airfoils": {
+    "mh45": {
+      "name": "x              y",
+      "coordinates": [
+        [
+          1.0,
+          0.0
+        ],
+        [
+          0.99261598,
+          -0.00017938
+        ],
+        [
+          0.97854084,
+          -9.869e-05
+        ],
+        [
+          0.96156846,
+          0.00052546
+        ],
+        [
+          0.94307224,
+          0.0015765
+        ],
+        [
+          0.92400403,
+          0.00293829
+        ],
+        [
+          0.90464789,
+          0.00454226
+        ],
+        [
+          0.8851724,
+          0.006345
+        ],
+        [
+          0.86566466,
+          0.00832085
+        ],
+        [
+          0.84614988,
+          0.01046165
+        ],
+        [
+          0.82661474,
+          0.01276326
+        ],
+        [
+          0.80702606,
+          0.01521504
+        ],
+        [
+          0.78734688,
+          0.01780329
+        ],
+        [
+          0.76754804,
+          0.02050221
+        ],
+        [
+          0.74762467,
+          0.0232793
+        ],
+        [
+          0.72760217,
+          0.02610621
+        ],
+        [
+          0.70753878,
+          0.02895509
+        ],
+        [
+          0.68751592,
+          0.03179249
+        ],
+        [
+          0.66758058,
+          0.03458696
+        ],
+        [
+          0.64772711,
+          0.03731602
+        ],
+        [
+          0.62792805,
+          0.03996674
+        ],
+        [
+          0.60816817,
+          0.04252671
+        ],
+        [
+          0.58844483,
+          0.04498332
+        ],
+        [
+          0.56875417,
+          0.04732603
+        ],
+        [
+          0.54908524,
+          0.04954601
+        ],
+        [
+          0.5294255,
+          0.05163874
+        ],
+        [
+          0.50976714,
+          0.0536007
+        ],
+        [
+          0.49010752,
+          0.05542837
+        ],
+        [
+          0.47044736,
+          0.05711903
+        ],
+        [
+          0.45078952,
+          0.05866975
+        ],
+        [
+          0.43113912,
+          0.06007589
+        ],
+        [
+          0.41150396,
+          0.06133193
+        ],
+        [
+          0.39189352,
+          0.06243131
+        ],
+        [
+          0.37231341,
+          0.06336537
+        ],
+        [
+          0.35276213,
+          0.06412564
+        ],
+        [
+          0.33323972,
+          0.06470335
+        ],
+        [
+          0.31376185,
+          0.06508936
+        ],
+        [
+          0.29435718,
+          0.06527007
+        ],
+        [
+          0.27504613,
+          0.06522556
+        ],
+        [
+          0.25583261,
+          0.06493634
+        ],
+        [
+          0.23671715,
+          0.06438322
+        ],
+        [
+          0.21770698,
+          0.06354728
+        ],
+        [
+          0.19881973,
+          0.06240804
+        ],
+        [
+          0.18008494,
+          0.06094538
+        ],
+        [
+          0.16154175,
+          0.05913397
+        ],
+        [
+          0.14323196,
+          0.05694659
+        ],
+        [
+          0.1252166,
+          0.05435169
+        ],
+        [
+          0.10759638,
+          0.05132204
+        ],
+        [
+          0.09051004,
+          0.04782719
+        ],
+        [
+          0.07415938,
+          0.04384423
+        ],
+        [
+          0.0589584,
+          0.03940609
+        ],
+        [
+          0.04529122,
+          0.03459755
+        ],
+        [
+          0.03338913,
+          0.02953397
+        ],
+        [
+          0.0240311,
+          0.02472609
+        ],
+        [
+          0.01713554,
+          0.02043615
+        ],
+        [
+          0.01188947,
+          0.0164765
+        ],
+        [
+          0.00787937,
+          0.01289035
+        ],
+        [
+          0.00493187,
+          0.00986206
+        ],
+        [
+          0.00284325,
+          0.00727975
+        ],
+        [
+          0.00144293,
+          0.00489852
+        ],
+        [
+          0.00058749,
+          0.00256853
+        ],
+        [
+          0.00022317,
+          0.00028353
+        ],
+        [
+          0.00038544,
+          -0.00184596
+        ],
+        [
+          0.00118455,
+          -0.00374553
+        ],
+        [
+          0.00272273,
+          -0.00545642
+        ],
+        [
+          0.00510389,
+          -0.00712985
+        ],
+        [
+          0.00847008,
+          -0.00898457
+        ],
+        [
+          0.01300718,
+          -0.0111514
+        ],
+        [
+          0.01880976,
+          -0.01346975
+        ],
+        [
+          0.02618997,
+          -0.01591144
+        ],
+        [
+          0.03651865,
+          -0.01872425
+        ],
+        [
+          0.05064046,
+          -0.02186899
+        ],
+        [
+          0.06638508,
+          -0.02468698
+        ],
+        [
+          0.08326064,
+          -0.02708845
+        ],
+        [
+          0.10106768,
+          -0.02905443
+        ],
+        [
+          0.11931857,
+          -0.03057978
+        ],
+        [
+          0.13795805,
+          -0.03173142
+        ],
+        [
+          0.15696051,
+          -0.03257517
+        ],
+        [
+          0.17618669,
+          -0.033153
+        ],
+        [
+          0.19556817,
+          -0.03349854
+        ],
+        [
+          0.2151147,
+          -0.03364763
+        ],
+        [
+          0.23480652,
+          -0.03363521
+        ],
+        [
+          0.2545855,
+          -0.03348553
+        ],
+        [
+          0.27441348,
+          -0.03321288
+        ],
+        [
+          0.29428723,
+          -0.03283082
+        ],
+        [
+          0.31421311,
+          -0.03235163
+        ],
+        [
+          0.33419194,
+          -0.03178753
+        ],
+        [
+          0.35421892,
+          -0.03115008
+        ],
+        [
+          0.37428397,
+          -0.03045087
+        ],
+        [
+          0.39437412,
+          -0.02969917
+        ],
+        [
+          0.41448315,
+          -0.02890059
+        ],
+        [
+          0.43461549,
+          -0.02806037
+        ],
+        [
+          0.45477836,
+          -0.02718516
+        ],
+        [
+          0.47496948,
+          -0.02628269
+        ],
+        [
+          0.49517672,
+          -0.0253596
+        ],
+        [
+          0.51539045,
+          -0.02441874
+        ],
+        [
+          0.53561204,
+          -0.02346203
+        ],
+        [
+          0.55584979,
+          -0.02249252
+        ],
+        [
+          0.57610687,
+          -0.0215148
+        ],
+        [
+          0.59637783,
+          -0.02053345
+        ],
+        [
+          0.61665369,
+          -0.01955073
+        ],
+        [
+          0.63692823,
+          -0.01856798
+        ],
+        [
+          0.65719927,
+          -0.01758624
+        ],
+        [
+          0.67746748,
+          -0.01660629
+        ],
+        [
+          0.69773586,
+          -0.01562863
+        ],
+        [
+          0.71800764,
+          -0.01465263
+        ],
+        [
+          0.73828324,
+          -0.01367727
+        ],
+        [
+          0.75856026,
+          -0.01270218
+        ],
+        [
+          0.77883527,
+          -0.01172777
+        ],
+        [
+          0.79910524,
+          -0.0107548
+        ],
+        [
+          0.81936849,
+          -0.00978503
+        ],
+        [
+          0.83962579,
+          -0.00881954
+        ],
+        [
+          0.85988305,
+          -0.00785512
+        ],
+        [
+          0.88015055,
+          -0.00688847
+        ],
+        [
+          0.90039634,
+          -0.00592428
+        ],
+        [
+          0.92052696,
+          -0.00495974
+        ],
+        [
+          0.94050753,
+          -0.00396586
+        ],
+        [
+          0.96003119,
+          -0.00294225
+        ],
+        [
+          0.97789431,
+          -0.00186493
+        ],
+        [
+          0.99254086,
+          -0.00071029
+        ],
+        [
+          1.0,
+          0.0
+        ]
+      ],
+      "source": "user supplied .dat file"
+    }
+  },
+  "propulsion": {
+    "battery": "B3S1000",
+    "state_of_charge": 0.9,
+    "battery_x": 0.02,
+    "battery_y": 0.0,
+    "battery_z": 0.0,
+    "include_component_masses": true,
+    "propulsors": [
+      {
+        "name": "Propulsor 1",
+        "motor": "M1260",
+        "propeller": "P10x4.7",
+        "esc": "ESC40",
+        "throttle": 1.0,
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "pitch_deg": 0.0,
+        "yaw_deg": 0.0
+      }
+    ]
+  },
+  "structure": {
+    "surface": "Main wing",
+    "spar_height": 0.03,
+    "allowable_stress": 300000000.0,
+    "ultimate_factor": 1.5,
+    "elastic_modulus": 70000000000.0,
+    "cap_width": 0.02
+  },
+  "motors": {
+    "M1100": {
+      "key": "M1100",
+      "name": "SunnySky X2216 II KV1100",
+      "Kv_rpm": 1100.0,
+      "resistance": 0.073,
+      "current_no_load": 0.9,
+      "current_max": 24.0,
+      "mass": 0.072,
+      "no_load_voltage": 10.0,
+      "cells_min": 2,
+      "cells_max": 4,
+      "notes": "Kv, resistance, no-load current, current_max and mass are SunnySky's published datasheet figures for this winding (no-load current quoted at 10 V); confirm them against the listing at order time. Lowest Kv in the catalog on the larger 22 x 16 mm stator: it turns the big slow-flyer propellers at a speed the data covers and carries 24 A doing it. 26 g heavier than the X2208, which on a 400 g airplane is not nothing. SunnySky recommends a 30 A ESC and the APC 9x4.7, 9x4.5, 9x6, 8x6 and 10x4.7."
+    },
+    "M1260": {
+      "key": "M1260",
+      "name": "SunnySky X2208 KV1260",
+      "Kv_rpm": 1260.0,
+      "resistance": 0.122,
+      "current_no_load": 0.4,
+      "current_max": 15.0,
+      "mass": 0.046,
+      "no_load_voltage": 10.0,
+      "cells_min": 2,
+      "cells_max": 4,
+      "notes": "Kv, resistance, no-load current, current_max and mass are SunnySky's published datasheet figures for this winding (no-load current quoted at 10 V); confirm them against the listing at order time. The small 22 x 8 mm stator: lightest and cheapest motor here, the best peak efficiency of the three, and a peak that lands at only 6 A -- the right motor for a light, slow airplane, and RC-1's. SunnySky's static table gives 780 gf at 13.9 A on an APC 9x4.7 SF and 570 gf at 11.7 A on a 10x4.7 SF, both at 11.1 V, and recommends an 18 A ESC."
+    },
+    "M1400": {
+      "key": "M1400",
+      "name": "SunnySky X2216 II KV1400",
+      "Kv_rpm": 1400.0,
+      "resistance": 0.055,
+      "current_no_load": 1.3,
+      "current_max": 33.0,
+      "mass": 0.072,
+      "no_load_voltage": 10.0,
+      "cells_min": 2,
+      "cells_max": 4,
+      "notes": "Kv, resistance, no-load current, current_max and mass are SunnySky's published datasheet figures for this winding (no-load current quoted at 10 V); confirm them against the listing at order time. Same can as the KV1100 with fewer turns of thicker wire: lower resistance, a no-load current of 1.3 A, and the WORST peak efficiency of the three despite the highest Kv, because peak efficiency ranks with I0*R. It needs about 16 A to reach that peak; on a small propeller at 3 A it is the least efficient motor here by a wide margin. SunnySky recommends a 40 A ESC and the APC 9x4.7, 9x4.5, 9x6, 8x6 and 7x6."
+    }
+  },
+  "batteries": {
+    "B2S1500": {
+      "key": "B2S1500",
+      "name": "Turnigy 2S 7.4 V 1500 mAh 40C LiPo",
+      "cells_series": 2,
+      "cells_parallel": 1,
+      "capacity_ah": 1.5,
+      "mass": 0.085,
+      "c_rating": 40.0,
+      "cell_resistance": 0.01,
+      "cell_voltage_nominal": 3.7,
+      "cell_voltage_full": 4.2,
+      "cell_voltage_empty": 3.0,
+      "notes": "Turnigy 1500 mAh 2S 40C with XT60; capacity, C rating and the 85 g mass are HobbyKing's listing, cell_resistance is an estimate (no pack vendor publishes it). Nearly the same mass and stored energy as B3S1000, delivered at two thirds the voltage: the same motor and propeller turn about a third slower on it."
+    },
+    "B3S1000": {
+      "key": "B3S1000",
+      "name": "Turnigy 3S 11.1 V 1000 mAh 40C LiPo",
+      "cells_series": 3,
+      "cells_parallel": 1,
+      "capacity_ah": 1.0,
+      "mass": 0.09,
+      "c_rating": 40.0,
+      "cell_resistance": 0.013,
+      "cell_voltage_nominal": 3.7,
+      "cell_voltage_full": 4.2,
+      "cell_voltage_empty": 3.0,
+      "notes": "Turnigy 1000 mAh 3S 40C with XT60; capacity and C rating are HobbyKing's listing, the mass is typical for the pack (the listings disagree between 88 and 105 g: weigh one), and cell_resistance is an estimate. RC-1's baseline pack."
+    }
+  },
+  "escs": {
+    "ESC40": {
+      "key": "ESC40",
+      "name": "SunnySky X-series 40 A airplane ESC, 4 A BEC",
+      "current_max": 40.0,
+      "mass": 0.04,
+      "efficiency": 0.96
+    }
+  },
+  "propellers": {
+    "P8x6": {
+      "key": "P8x6",
+      "name": "APC 8x6E",
+      "mass": 0.0139,
+      "data": "apce_8x6",
+      "diameter": null,
+      "pitch": null,
+      "rpm_max": 23750.0,
+      "points": [],
+      "notes": "APC thin electric; UIUC measured performance, APC published mass (0.49 oz). The only fast propeller here: p/D = 0.75 puts its efficiency peak near J = 0.6, and it is the one the KV1400 motor is sized for."
+    },
+    "P9x4.7": {
+      "key": "P9x4.7",
+      "name": "APC 9x4.7SF",
+      "mass": 0.0091,
+      "data": "apcsf_9x4.7",
+      "diameter": null,
+      "pitch": null,
+      "rpm_max": 7222.222222222223,
+      "points": [],
+      "notes": "APC slow flyer; UIUC measured performance, APC published mass (0.32 oz). Thin, flexible blades meant for low rpm: APC rates the SF line to 65,000/D rpm, 7,200 rpm for this one, and the analysis warns when a motor spins it past that."
+    },
+    "P10x4.7": {
+      "key": "P10x4.7",
+      "name": "APC 10x4.7SF",
+      "mass": 0.0119,
+      "data": "apcsf_10x4.7",
+      "diameter": null,
+      "pitch": null,
+      "rpm_max": 6500.0,
+      "points": [],
+      "notes": "APC slow flyer; UIUC measured performance, APC published mass (0.42 oz). Largest disk in the catalog, which is the efficient way to make static thrust, at the cost of the highest torque demand. Same pitch as P9x4.7, so the pair is a controlled diameter comparison. SF rpm limit 6,500."
+    }
+  },
+  "notes": "Demonstration project with a constant-chord center section and two tapered outer panels. It is not a validated aircraft design.",
+  "format_version": 3
+}

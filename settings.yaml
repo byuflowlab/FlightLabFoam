@@ -1,0 +1,14 @@
+# FlightLabFoam settings. Edit here or from the menu in the app.
+# Lengths are mm and feeds are mm/min, whatever the display units.
+units: mm
+machine:
+  name: ME 415 foam cutter
+  dialect: mach3_xyaz
+  carriage_separation: 1000.0
+  travel_horizontal: 600.0
+  travel_vertical: 300.0
+  xy_carriage_side: left
+  feed_model: xy
+  max_feed: 600.0
+  heat_on_code: M3
+  heat_off_code: M5

@@ -93,3 +93,26 @@ def test_left_wing_swaps_carriages(tapered, settings):
     left = toolpath.build(tapered, settings, 0, "left")
     assert right.placement.root_on != left.placement.root_on
     assert np.allclose(right.xy, left.az) and np.allclose(right.az, left.xy)
+
+
+def test_block_position_shifts_the_cut_and_adds_an_approach(design, settings):
+    base = toolpath.build(design, settings, 0)
+    design.blocks = [type(design.block(0))(machine_x=50.0, machine_y=20.0)]
+    moved = toolpath.build(design, settings, 0)
+    assert len(moved.xy) == len(base.xy) + 2
+    # up from program zero, across to the entry face, then the same cut shifted by (50, 20)
+    assert np.allclose(moved.xy[0], [0.0, base.xy[0, 1] + 20.0])
+    assert np.allclose(moved.xy[1], [50.0, base.xy[0, 1] + 20.0])
+    assert np.allclose(moved.xy[1:-1], base.xy + [50.0, 20.0])
+    assert np.allclose(moved.xy[-1], moved.xy[0])
+    assert moved.kind[-2:] == ["exit", "exit"]
+    # the block-frame faces do not move
+    assert np.allclose(moved.face_root, base.face_root)
+
+
+def test_block_behind_program_zero_is_an_error(design, settings):
+    from flightlabfoam.checks import check
+
+    design.blocks = [type(design.block(0))(machine_x=-5.0)]
+    tp = toolpath.build(design, settings, 0)
+    assert any(c["level"] == "error" and "behind program zero" in c["message"] for c in check(tp, design, settings))

@@ -25,7 +25,7 @@
     <button role="tab" data-tab="load">Load airplane</button>
     <button role="tab" data-tab="wing" class="on">Wing design</button>
     <button role="tab" data-tab="features">Spars, holes &amp; control surfaces</button>
-    <button role="tab" data-tab="block">Block placement</button>
+    <button role="tab" data-tab="block">Placement</button>
     <button role="tab" data-tab="cutting">Cutting settings</button>
     <button role="tab" data-tab="animation">Cutting animation</button>
     <button role="tab" data-tab="generate">Generate G-code</button>
@@ -105,7 +105,16 @@
       <div class="card">
         <h2>Foam block for this panel</h2>
         <div class="form-grid" id="block-form"></div>
-        <p class="hint">Program zero is the bottom edge of the block's entry face: zero the wire there. The cut-in is the foam the wire crosses before it reaches the airfoil. Offsets move the panel from the centred position.</p>
+      </div>
+      <div class="card">
+        <h2>Block placement</h2>
+        <div class="form-grid" id="block-place-form"></div>
+        <p class="hint">Where the block sits in the cutting area. Program zero is where you zero the wire before running the file. With both distances from program zero at 0, program zero is the bottom edge of the block's entry face, the simplest setup. To zero the wire at a fixed point on the machine instead, such as a corner of the table, set the block down a measured distance from it and enter that distance here.</p>
+      </div>
+      <div class="card">
+        <h2>Panel placement</h2>
+        <div class="form-grid" id="panel-place-form"></div>
+        <p class="hint">Where the panel sits inside the block. The cut-in is the foam the wire crosses before it reaches the airfoil. The offsets move the panel from the centred position.</p>
       </div>
       <div class="card view-card">
         <div class="view-tabs" id="block-view-tabs">

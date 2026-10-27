@@ -1,5 +1,6 @@
 'use strict';
-// Block placement tab: the foam block for the selected panel.
+// Placement tab: the foam block for the selected panel, where it sits in the cutting area,
+// and where the panel sits inside it.
 
 let blockViewMode = 'panel';
 let blockSizeInputs = {};
@@ -26,18 +27,24 @@ function renderBlock() {
     size('span', 'Span-wise length'),
     size('chord', 'Chord-wise length'),
     size('thickness', 'Thickness'),
-    h('h3', {}, 'Placement'),
-    field('Cut-in distance', numInput(() => b.cut_in, v => { b.cut_in = v; }, 'len', ch(), { min: 0 }), 'len'),
-    field('Vertical offset (panel up)', numInput(() => b.vertical_offset, v => { b.vertical_offset = v; }, 'len', ch()), 'len'),
-    field('Span-wise offset (panel toward tip)', numInput(() => b.span_offset, v => { b.span_offset = v; }, 'len', ch()), 'len'),
-    field('Block offset between carriages (toward A/Z)', numInput(() => b.machine_offset, v => { b.machine_offset = v; }, 'len', ch()), 'len'),
     h('div', {}, h('button', {
       class: 'btn ghost', type: 'button', onclick: () => {
         state.design.blocks = state.design.blocks.map(() => clone(b));
         toast('Copied to every panel');
         changed(true);
       },
-    }, 'Use these settings for every panel')),
+    }, 'Use these block settings for every panel')),
+  );
+  const num = (key, label, extra) => field(label, numInput(() => b[key], v => { b[key] = v; }, 'len', ch(), extra), 'len');
+  fill($('#block-place-form'),
+    num('machine_x', 'Entry face from program zero (X)', { min: 0 }),
+    num('machine_y', 'Block bottom above program zero (Y)'),
+    num('machine_offset', 'Centre offset between the carriages (toward A/Z)'),
+  );
+  fill($('#panel-place-form'),
+    num('cut_in', 'Cut-in distance', { min: 0 }),
+    num('vertical_offset', 'Vertical offset (panel up)'),
+    num('span_offset', 'Span-wise offset (panel toward tip)'),
   );
   showAutoSize();
   drawBlockViews();

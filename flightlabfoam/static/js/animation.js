@@ -48,7 +48,8 @@ function drawAnim() {
   const ch = Math.round(cw * 0.5);
   canvas.width = cw * dpr;
   canvas.height = ch * dpr;
-  canvas.style.height = ch + 'px';
+  // only on a real change: setting it inside the resize callback would trigger another one
+  if (canvas.style.height !== ch + 'px') canvas.style.height = ch + 'px';
   const g = canvas.getContext('2d');
   g.setTransform(dpr, 0, 0, dpr, 0, 0);
   g.clearRect(0, 0, cw, ch);
@@ -64,7 +65,9 @@ function drawAnim() {
   const b = pv.block;
   const [wb0, wb1] = pv.w_block;
   const boxCorners = [];
-  for (const w of [wb0, wb1]) for (const X of [0, b.chord]) for (const Y of [0, b.thickness]) boxCorners.push(project(X, Y, w));
+  const bx = b.x || 0, by = b.y || 0;
+  const X0 = bx, X1 = bx + b.chord, Y0 = by, Y1 = by + b.thickness;
+  for (const w of [wb0, wb1]) for (const X of [X0, X1]) for (const Y of [Y0, Y1]) boxCorners.push(project(X, Y, w));
   const pts = [...boxCorners, ...pv.xy.map(p => project(p[0], p[1], 0)), ...pv.az.map(p => project(p[0], p[1], D))];
   const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
   const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
@@ -81,14 +84,14 @@ function drawAnim() {
   };
 
   // foam block: faces at each end and the long edges between them
-  const face = w => [[0, 0, w], [b.chord, 0, w], [b.chord, b.thickness, w], [0, b.thickness, w], [0, 0, w]];
+  const face = w => [[X0, Y0, w], [X1, Y0, w], [X1, Y1, w], [X0, Y1, w], [X0, Y0, w]];
   g.fillStyle = cssVar('--block');
   g.beginPath();
   face(wb0).forEach((p, j) => { const [sx, sy] = P(...p); j ? g.lineTo(sx, sy) : g.moveTo(sx, sy); });
   g.fill();
   stroke(face(wb0), cssVar('--block-line'), 1);
   stroke(face(wb1), cssVar('--block-line'), 1);
-  for (const [X, Y] of [[0, 0], [b.chord, 0], [b.chord, b.thickness], [0, b.thickness]]) stroke([[X, Y, wb0], [X, Y, wb1]], cssVar('--block-line'), 1);
+  for (const [X, Y] of [[X0, Y0], [X1, Y0], [X1, Y1], [X0, Y1]]) stroke([[X, Y, wb0], [X, Y, wb1]], cssVar('--block-line'), 1);
 
   // the panel's cut at the wing root and tip
   stroke(pv.root.map(p => [p[0], p[1], pv.w_root]), cssVar('--root'), 1.2);
@@ -144,5 +147,5 @@ function initAnimation() {
     drawAnim();
   });
   on('preview', setAnimPath);
-  new ResizeObserver(() => drawAnim()).observe($('#anim-canvas'));
+  new ResizeObserver(() => requestAnimationFrame(drawAnim)).observe($('#anim-canvas'));
 }

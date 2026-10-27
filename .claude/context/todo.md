@@ -7,8 +7,8 @@
 - [ ] Cut a tapered test panel to calibrate kerf at the slow and fast ends.
 
 ## Features
-- [ ] Add an exit button top right. 
-- [ ] Checks to make sure that the spar slots and lightening holes don't intersect the surface opposite from entry (cutting the airfoil in half). 
+- [x] Done 2026-10-23: Add an exit button top right. It stops the server through `/api/shutdown`.
+- [x] Done 2026-10-23: Checks to make sure that the spar slots and lightening holes don't intersect the surface opposite from entry (cutting the airfoil in half). `checks.feature_checks` warns on a breakthrough of either skin, on walls thinner than the minimum-wall setting, and on features intersecting each other.
 - [ ] Double-click student launchers per OS, like flightlab's `student_setup/`.
 - [ ] Two panels from one block, stacked or nested, with a collision check.
 - [ ] Kerf that depends on the local wire speed, instead of one value per end.

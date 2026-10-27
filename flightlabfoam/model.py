@@ -40,7 +40,9 @@ class Block:
     """The foam block for one panel.
 
     With ``auto`` on, span, chord and thickness are sized to the panel with ``margin``
-    of foam around it. Offsets move the block relative to the centred position.
+    of foam around it. ``cut_in`` and the two panel offsets place the panel inside the
+    block (centred by default). ``machine_x``, ``machine_y`` and ``machine_offset``
+    place the block in the cutting area.
     """
 
     auto: bool = True
@@ -52,6 +54,8 @@ class Block:
     vertical_offset: float = 0.0  # panel position above the block's centre
     span_offset: float = 0.0  # panel position along the block span, toward the tip
     machine_offset: float = 0.0  # block centre from the midpoint between the carriages, toward the A/Z carriage
+    machine_x: float = 0.0  # entry face from program zero along X; 0 puts program zero on the entry face
+    machine_y: float = 0.0  # block bottom above program zero along Y; 0 puts program zero on the bottom
 
 
 @dataclass

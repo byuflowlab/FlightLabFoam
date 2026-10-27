@@ -4,9 +4,11 @@ Machine frame
 -------------
 * The X/Y carriage carries one end of the wire and the A/Z carriage the other. X and
   A are horizontal (into the block); Y and Z are vertical.
-* X = 0 (and A = 0) is the block's entry face, the face the wire starts at. Y = 0
-  (and Z = 0) is the bottom of the block. Zero the wire at the entry face's bottom
-  edge before running a file.
+* Program zero is where the wire is zeroed before running a file. By default it is
+  the bottom edge of the block's entry face (the face the wire starts at): X = 0 (and
+  A = 0) on that face, Y = 0 (and Z = 0) on the block bottom. The block's
+  ``machine_x`` and ``machine_y`` move the block away from program zero, for zeroing
+  at a fixed point on the machine instead.
 * The entry edge (leading or trailing, from the cut settings) faces X = 0. Cutting
   trailing edge first therefore turns the airfoil around in the machine.
 * Spanwise, ``w`` runs from the X/Y carriage (w = 0) to the A/Z carriage
@@ -41,9 +43,14 @@ class Placement:
     y_bottom: float  # block bottom in the panel frame
     flip: bool  # True when the trailing edge enters first
 
-    def to_machine(self, pts: np.ndarray) -> np.ndarray:
+    def to_block(self, pts: np.ndarray) -> np.ndarray:
+        """Panel frame to block frame: X from the entry face, Y from the block bottom."""
         u = -pts[:, 0] if self.flip else pts[:, 0]
         return np.column_stack([u - self.u_face, pts[:, 1] - self.y_bottom])
+
+    def to_machine(self, pts: np.ndarray) -> np.ndarray:
+        """Panel frame to machine coordinates, measured from program zero."""
+        return self.to_block(pts) + [self.block.machine_x, self.block.machine_y]
 
 
 @dataclass
@@ -59,7 +66,7 @@ class Toolpath:
     kind: list[str]  # start | lead_in | cut | exit
     placement: Placement
     ends: PanelEnds
-    face_root: np.ndarray  # cut outline where it leaves the block on the root side
+    face_root: np.ndarray  # cut outline where it leaves the block on the root side, block frame
     face_tip: np.ndarray
     warnings: list[str] = field(default_factory=list)
 
@@ -130,12 +137,18 @@ def build(design: Design, settings: Settings, panel: int, side: str = "right") -
         order = [*range(le, -1, -1), *range(n - 1, le - 1, -1)]
     root, tip = root[order], tip[order]
 
-    # entry and exit: straight in from the entry face at the entry point's height
+    # entry and exit: up from program zero to the entry point's height, across to the
+    # entry face, straight in, and back out the same way. With the block at program
+    # zero the first two points coincide and the duplicate is dropped below.
     root, tip = pl.to_machine(root), pl.to_machine(tip)
-    start_r, start_t = np.array([0.0, root[0, 1]]), np.array([0.0, tip[0, 1]])
-    root = np.vstack([start_r, root, start_r])
-    tip = np.vstack([start_t, tip, start_t])
-    kind = ["start", "lead_in", *["cut"] * (len(order) - 1), "exit"]
+    x_face = pl.block.machine_x
+
+    def approach(y):
+        return np.array([[0.0, y], [x_face, y]])
+
+    root = np.vstack([approach(root[0, 1]), root, approach(root[0, 1])[::-1]])
+    tip = np.vstack([approach(tip[0, 1]), tip, approach(tip[0, 1])[::-1]])
+    kind = ["start", "start", "lead_in", *["cut"] * (len(order) - 1), "exit", "exit"]
 
     span = pl.w_tip - pl.w_root
     w_xy, w_az = 0.0, m.carriage_separation
@@ -147,7 +160,7 @@ def build(design: Design, settings: Settings, panel: int, side: str = "right") -
     kind = [k for k, ok in zip(kind, keep) if ok]
 
     feed, seconds = _feeds(xy, az, root, tip, kind, cut, m)
-    faces = [pl.to_machine(ends.at((w - pl.w_root) / span)) for w in pl.w_block]
+    faces = [pl.to_block(ends.at((w - pl.w_root) / span)) for w in pl.w_block]
     return Toolpath(
         panel=panel,
         side=side,

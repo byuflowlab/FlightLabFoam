@@ -33,6 +33,8 @@ def check(tp: Toolpath, design: Design, settings: Settings) -> list[dict]:
     if b.span + _TOL < span:
         error(f"the block ({b.span:.1f} mm) is shorter than the panel span ({span:.1f} mm)")
     lo, hi = sorted(pl.w_block)
+    if b.machine_x < 0:
+        error("the block's entry face is behind program zero, so the wire would start inside the foam; use a distance of 0 or more")
     if lo < -_TOL or hi > m.carriage_separation + _TOL:
         error("the block does not fit between the carriages; reduce its span or its offset between the carriages")
     if b.span + _TOL >= span:
@@ -50,11 +52,11 @@ def check(tp: Toolpath, design: Design, settings: Settings) -> list[dict]:
 
     for name, pts, h, v in (("X/Y", tp.xy, "X", "Y"), ("A/Z", tp.az, "A", "Z")):
         if pts[:, 0].min() < -_TOL:
-            warn(f"the {name} carriage goes to {h} = {pts[:, 0].min():.1f} mm, behind the entry face")
+            warn(f"the {name} carriage goes to {h} = {pts[:, 0].min():.1f} mm, behind program zero")
         if pts[:, 0].max() > m.travel_horizontal + _TOL:
             error(f"the {name} carriage needs {h} = {pts[:, 0].max():.1f} mm but travels only {m.travel_horizontal:g} mm")
         if pts[:, 1].min() < -_TOL:
-            error(f"the {name} carriage goes to {v} = {pts[:, 1].min():.1f} mm, below the bottom of the block")
+            error(f"the {name} carriage goes to {v} = {pts[:, 1].min():.1f} mm, below program zero")
         if pts[:, 1].max() > m.travel_vertical + _TOL:
             error(f"the {name} carriage needs {v} = {pts[:, 1].max():.1f} mm but travels only {m.travel_vertical:g} mm")
 

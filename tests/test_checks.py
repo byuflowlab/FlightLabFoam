@@ -87,3 +87,11 @@ def test_cuts_that_cannot_be_built_are_still_errors(design):
     design.holes = [Hole(x_c=0.3 + 5.0 / 200)]  # the slit lands on the slot wall
     with pytest.raises(ValueError, match="at the edge of the square spar slot"):
         panel_ends(design, 0)
+
+
+def test_trailing_edge_thinner_than_the_machine_minimum_is_a_warning(design, settings):
+    settings.machine.min_te_thickness = 1.5
+    design.cut.te_min_thickness = 1.0
+    assert any("trailing edge is only 1 mm" in m for m in messages(design, settings))
+    design.cut.te_min_thickness = 1.5
+    assert not any("trailing edge is only" in m for m in messages(design, settings))

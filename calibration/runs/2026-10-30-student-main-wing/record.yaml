@@ -1,0 +1,83 @@
+# One calibration run: a foam block and the cuts made in it.
+# Lengths are mm. Each measurement is a list of readings; extra readings are repeats,
+# by the same person or someone else. null means not recorded.
+#
+# Not a calibration cut: a student team's main wing (ME 415 Project Milestone 6), cut with
+# FlightLabFoam and measured afterwards. The airplane is Project_Milestone_6.flightlab.json;
+# the wing panel as cut is main-wing.foam.json, with the span shortened from the imported
+# 502.5 mm (its length along the 5.7 deg dihedral) to 500 mm to fit the foam.
+
+date: 2026-10-30  # the day the files came in; the cut date was not recorded
+measured_by: an undergraduate student
+# Lower confidence than the calibration runs: an undergraduate's ruler readings, recorded in
+# cm to one decimal, on a real wing rather than a test panel. Counts half in the totals.
+weight: 0.5
+block:
+  name: student main wing
+  size: {front_to_back: 205.0, along_wire: 500.0, tall: 50.8}  # as set in the design
+  foam: null
+conditions:
+  heat_setting: null
+  wire: null
+  notes: >-
+    Leading edge first with a 2.9 mm cut-in and kerf compensation of 1.0 mm at both ends.
+    SA7026, 200 mm chord, untapered and unswept, -5 deg twist at the tip, a 6 mm round
+    spar at 30% chord entered from the lower surface. Symmetric: a right and a left wing.
+    SA7026 is cambered: its thickness across the chord line is 18.0 mm, but its overall
+    height is 19.4 mm. If the part thickness was read as its height lying flat, every
+    kerf here is about 0.7 mm too low.
+measured_with: {tool: ruler, resolution: 1.0}
+# the settings the G-code was generated with, locally
+settings:
+  units: mm
+  machine:
+    name: ME 415 foam cutter
+    dialect: mach3_xyaz
+    carriage_separation: 773.1125
+    travel_horizontal: 600.0
+    travel_vertical: 300.0
+    xy_carriage_side: left
+    feed_model: xy
+    max_feed: 600.0
+    min_wall_thickness: 2.0
+    heat_on_code: M3
+    heat_off_code: M5
+app_version: 89b6285 with the uncommitted carriage-separation change
+
+# Readings are labelled root and tip; ends says which carriage each faced. The right wing
+# has its root at the A/Z carriage and the left wing at the X/Y carriage.
+tests:
+  right:
+    design: main-wing.foam.json
+    gcode: Project_Milestone6-Main-Wing-panel1-right.nc
+    side: right
+    ends: {root: az, tip: xy}
+    part_chord: {root: [193], tip: [194]}
+    part_thickness: {root: [19], tip: [19]}
+    void_thickness: {root: [20], tip: [19.5]}
+    le_depth: {root: [204], tip: [203]}
+    le_depth_from: back
+    exclude:
+      void_thickness: >-
+        the void reads no thicker than the path the wire followed (20.0 mm), when it should be
+        about 2 mm thicker still; with a
+        2.9 mm cut-in the block above and below the wing is nearly cut free, so the void
+        closes up when handled
+      le_depth: >-
+        with a 2.9 mm cut-in this is the block's depth less about 1 mm, not a measurement
+        of the cut
+    notes: The tip has twist.
+  left:
+    design: main-wing.foam.json
+    gcode: Project_Milestone6-Main-Wing-panel1-left.nc
+    side: left
+    ends: {root: xy, tip: az}
+    part_chord: {root: [193], tip: [192]}
+    part_thickness: {root: [18], tip: [18]}
+    void_thickness: {root: [18], tip: [19]}
+    le_depth: {root: [200], tip: [204]}
+    le_depth_from: back
+    exclude:
+      void_thickness: as for the right wing
+      le_depth: as for the right wing
+    notes: The tip has twist.

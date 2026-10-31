@@ -152,6 +152,11 @@ svg text { fill: var(--muted); font-family: var(--ui); }
 .surface-option { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--r); cursor: pointer; }
 .surface-option:hover { border-color: var(--accent); }
 .surface-option small { color: var(--muted); }
+.span-choice { border: 1px solid var(--line); border-radius: var(--r); padding: 8px 12px 10px; margin: 12px 0; }
+.span-choice legend { font-weight: 600; padding: 0 4px; }
+.span-option { display: flex; align-items: flex-start; gap: 8px; margin-top: 6px; cursor: pointer; }
+.span-option span { display: grid; }
+.span-option small { color: var(--muted); }
 
 dialog { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); width: min(760px, calc(100vw - 32px)); padding: 18px; }
 dialog::backdrop { background: rgba(0, 0, 0, 0.35); }

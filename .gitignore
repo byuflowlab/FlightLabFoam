@@ -7,3 +7,7 @@ build/
 dist/
 *.tmp
 .DS_Store
+
+# calibration: generated designs and G-code stay local; runs/*/record.yaml is committed
+calibration/**/*.nc
+calibration/**/*.json

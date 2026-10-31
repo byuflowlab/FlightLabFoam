@@ -1,0 +1,66 @@
+# One calibration run: a foam block and the cuts made in it.
+# Lengths are mm. Each measurement is a list of readings; extra readings are repeats,
+# by the same person or someone else. null means not recorded.
+
+date: 2026-10-31T12:00
+block:
+  name: block1
+  size: {front_to_back: 205.0, along_wire: 445.0, tall: 50.8}
+  foam: null  # type and colour
+  ends: {left: xy, right: az}  # which carriage each end of the block faced
+conditions:
+  heat_setting: null
+  wire: null  # diameter or gauge, tension
+  notes: null
+measured_with: {tool: ruler, resolution: 1.0}
+# the machine settings the G-code was generated with
+settings:
+  units: mm
+  machine:
+    name: ME 415 foam cutter
+    dialect: mach3_xyaz
+    carriage_separation: 773.1125
+    travel_horizontal: 600.0
+    travel_vertical: 300.0
+    xy_carriage_side: left
+    feed_model: xy
+    max_feed: 600.0
+    min_wall_thickness: 2.0
+    heat_on_code: M3
+    heat_off_code: M5
+app_version: 89b6285  # commit the G-code was generated from
+
+# Each test names the design and G-code that were cut (in this folder).
+# part_*: the airfoil that came out; void_*: the airfoil-shaped hole left in the block.
+# le_depth: from the entry face to the leading-edge tip of the void.
+tests:
+  A:
+    design: test-A-straight.foam.json
+    gcode: test-A-straight.nc
+    part_chord: {left: [43], right: [43]}
+    part_thickness: {left: [5.5], right: [5.5]}
+    void_chord: {left: [50, 50], right: [50, 50]}
+    void_thickness: {left: [9, 9], right: [9, 9]}
+    le_depth: {left: [94], right: [94]}
+    notes: >-
+      Void chord, left: the lower surface looks like 45 mm. It's hard to see where the
+      trailing edge starts in the void, so the void chord may mean nothing.
+      The second void readings were by someone else.
+  B:
+    design: test-B-sweep-aft.foam.json
+    gcode: test-B-sweep-aft.nc
+    part_chord: {left: [43], right: [41]}
+    part_thickness: {left: [5], right: [5]}
+    void_chord: {left: [50], right: [50]}
+    void_thickness: {left: [9], right: [9]}
+    le_depth: {left: [194], right: [92]}
+    notes: null
+  C:
+    design: test-C-sweep-forward.foam.json
+    gcode: test-C-sweep-forward.nc
+    part_chord: {left: [43], right: [44]}
+    part_thickness: {left: [6], right: [6]}
+    void_chord: {left: [48], right: [52]}
+    void_thickness: {left: [9], right: [10]}
+    le_depth: {left: [95], right: [194]}
+    notes: null

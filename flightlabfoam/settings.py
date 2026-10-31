@@ -25,7 +25,9 @@ _lock = threading.Lock()
 class Machine:
     name: str = "ME 415 foam cutter"
     dialect: str = "mach3_xyaz"
-    carriage_separation: float = 1000.0  # mm between the two wire carriages
+    # mm between the last fixed points where the wire touches each carriage;
+    # measured on the ME 415 cutter as 30.4375 in
+    carriage_separation: float = 773.1125
     travel_horizontal: float = 600.0  # mm of X (and A) travel
     travel_vertical: float = 300.0  # mm of Y (and Z) travel
     xy_carriage_side: str = "left"  # side of the X/Y carriage, seen from the X0 end looking along +X
@@ -35,6 +37,9 @@ class Machine:
     feed_model: str = "xy"
     max_feed: float = 600.0  # mm/min; faster moves are flagged
     min_wall_thickness: float = 2.0  # mm; thinner foam between a feature and a skin or another feature is flagged
+    # mm; a design whose trailing edge is thickened to less than this is flagged, since a thinner
+    # edge melts away and shortens the chord. 1 mm from the first cuts; refine with block 2.
+    min_te_thickness: float = 1.0
     heat_on_code: str = "M3"
     heat_off_code: str = "M5"
 
@@ -70,6 +75,8 @@ class Settings:
             raise ValueError("travel limits and maximum feed must be positive")
         if m.min_wall_thickness < 0:
             raise ValueError("the minimum wall thickness cannot be negative")
+        if m.min_te_thickness < 0:
+            raise ValueError("the minimum trailing-edge thickness cannot be negative")
 
 
 def settings_path() -> Path:

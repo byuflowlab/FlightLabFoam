@@ -73,6 +73,11 @@ def check(tp: Toolpath, design: Design, settings: Settings) -> list[dict]:
     cut = design.cut
     if tp.feed.max() > m.max_feed:
         warn(f"F reaches {tp.feed.max():.0f} mm/min, above the machine limit of {m.max_feed:g} mm/min")
+    if cut.te_min_thickness < m.min_te_thickness - _TOL:
+        warn(
+            f"the trailing edge is only {cut.te_min_thickness:g} mm thick; on this machine an edge thinner than "
+            f"{m.min_te_thickness:g} mm tends to melt away and shorten the chord (Cutting settings)"
+        )
     if cut.kerf_root == 0 and cut.kerf_tip == 0:
         out.append({"level": "info", "message": "kerf is zero, so the part will come out slightly undersize"})
 

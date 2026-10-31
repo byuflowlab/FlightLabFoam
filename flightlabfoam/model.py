@@ -117,7 +117,7 @@ class CutSettings:
     entry: str = "trailing"  # trailing | leading: which edge the wire reaches first
     kerf_root: float = 0.0  # path offset outside the root section
     kerf_tip: float = 0.0  # path offset outside the tip section
-    te_min_thickness: float = 0.5  # the trailing edge is thickened to at least this
+    te_min_thickness: float = 1.0  # the trailing edge is thickened to at least this; thinner melts away
     points_per_surface: int = 80
     le_clustering: float = 1.25  # 1 = light, 1.25 = medium, 1.5 = strong; see airfoil.stations
     comment_header: bool = False

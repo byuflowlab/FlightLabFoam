@@ -109,7 +109,7 @@ def create_app(settings_path: Path | None = None) -> Flask:
         data = body()
         text = data.get("text", "")
         base = Design.from_dict(data["design"]) if data.get("design") else None
-        design, notes = flightlab_import.load_surface(text, data.get("surface"), base)
+        design, notes = flightlab_import.load_surface(text, data.get("surface"), base, data.get("span", "true"))
         return jsonify(
             {
                 "surfaces": flightlab_import.surfaces(json.loads(text)),

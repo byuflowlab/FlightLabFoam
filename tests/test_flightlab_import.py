@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pytest
@@ -67,3 +68,41 @@ def test_bad_input():
         load_surface("{}")
     with pytest.raises(ValueError, match="no surface named"):
         load_surface(read("rc1-hw1.flightlab.json"), "Canard")
+
+
+DIHEDRAL = json.dumps(
+    {
+        "name": "Glider",
+        "surfaces": [
+            {
+                "name": "Main Wing",
+                "symmetric": True,
+                "stations": [
+                    {"x_le": 0.0, "y": 0.0, "z": 0.0, "chord": 0.2, "airfoil": "naca2412"},
+                    {"x_le": 0.0, "y": 0.5, "z": 0.05, "chord": 0.2, "airfoil": "naca2412"},
+                ],
+            }
+        ],
+    }
+)
+
+
+def test_dihedral_is_reported_with_both_spans():
+    (s,) = surfaces(json.loads(DIHEDRAL))
+    assert s["dihedral"] == pytest.approx(5.71, abs=0.01)
+    assert s["span_true"] == pytest.approx(502.49, abs=0.01)
+    assert s["span_plan"] == pytest.approx(500.0)
+
+
+def test_dihedral_panel_is_cut_at_its_true_length_by_default():
+    d, notes = load_surface(DIHEDRAL)
+    assert d.sections[1].span_pos == pytest.approx(502.49, abs=0.01)
+    assert any("designed 500.0 mm" in n for n in notes)
+
+
+def test_dihedral_panel_can_be_cut_at_its_plan_span():
+    d, notes = load_surface(DIHEDRAL, span="plan")
+    assert d.sections[1].span_pos == pytest.approx(500.0)
+    assert any("2.5 mm short of the design" in n for n in notes)
+    with pytest.raises(ValueError):
+        load_surface(DIHEDRAL, span="projected")

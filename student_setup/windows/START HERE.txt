@@ -1,0 +1,13 @@
+FLIGHTLABFOAM FOR WINDOWS
+
+1. Double-click "Start FlightLabFoam.cmd".
+2. Keep the launcher window open while you use FlightLabFoam in your browser.
+3. Click Exit in the app, or close the launcher window, when you are finished.
+
+The first launch needs internet access and may take a few minutes. Later
+launches are faster. FlightLabFoam checks for updates automatically.
+
+If Windows SmartScreen appears, choose More info, check that the file came from
+your course, and choose Run anyway.
+
+If setup fails, take a screenshot of the launcher window and send it to your TA.

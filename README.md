@@ -4,9 +4,13 @@ A local web app that designs wing panels and writes G-code for a 4-axis hot-wire
 
 Note: This build targets the yellow foam cutter at BYU. If you're using a different foam cutter make sure to change your cutter profile in settings. 
 
+## Student download
+
+No Git, Python, or terminal commands needed. Download the launcher for [macOS](student_setup/downloads/FlightLabFoam-macOS.zip), [Windows](student_setup/downloads/FlightLabFoam-Windows.zip), or [Linux](student_setup/downloads/FlightLabFoam-Linux.zip), unzip it, read **START HERE**, and double-click the launcher. The first launch downloads a private copy of Python and the app and takes a few minutes; later launches start in seconds and update automatically when a new build is promoted. Settings made from the ☰ menu are kept across updates. Instructors: see [student_setup/README.md](student_setup/README.md).
+
 ## Quick start
 
-You need [uv](https://docs.astral.sh/uv/), which downloads the right Python and libraries by itself. Install it once:
+For development, or to run from a clone of this repository, you need [uv](https://docs.astral.sh/uv/), which downloads the right Python and libraries by itself. Install it once:
 
 - macOS and Linux: `curl -LsSf https://astral.sh/uv/install.sh | sh`
 - Windows (PowerShell): `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
@@ -35,7 +39,7 @@ The tabs run left to right in the order you would use them. The bar under the ta
 - **Cutting animation** plays the selected panel's cut: both carriages, the wire between them, the block and the panel, timed from the programmed feeds.
 - **Generate G-code** builds one panel or all of them, left and right halves, shows the checks for each file, and downloads the files singly or as a zip. Files with errors are not offered for download.
 
-The **☰ menu** opens the settings: display units (mm or inches) and the foam cutter profile. They are saved to [settings.yaml](settings.yaml) in this folder.
+The **☰ menu** opens the settings: display units (mm or inches) and the foam cutter profile. They are saved to [settings.yaml](settings.yaml) in this folder, or, with the student launchers, to `settings.yaml` in the FlightLabFoam data folder (`~/.local/share/flightlabfoam` on macOS and Linux, `%LOCALAPPDATA%\FlightLabFoam` on Windows).
 
 ## Conventions
 

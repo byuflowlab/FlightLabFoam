@@ -1,0 +1,71 @@
+name: Student launcher smoke tests
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/student-launchers.yml"
+      - "student_setup/build_downloads.sh"
+      - "student_setup/macos/**"
+      - "student_setup/windows/**"
+      - "student_setup/linux/**"
+  pull_request:
+    paths:
+      - ".github/workflows/student-launchers.yml"
+      - "student_setup/build_downloads.sh"
+      - "student_setup/macos/**"
+      - "student_setup/windows/**"
+      - "student_setup/linux/**"
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    name: macOS launcher
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - name: Run the student launcher twice (install, then reuse)
+        env:
+          FLIGHTLABFOAM_TEST_ONLY: "1"
+          XDG_DATA_HOME: ${{ runner.temp }}/flightlabfoam-student-test
+        run: |
+          ./student_setup/macos/Start\ FlightLabFoam.command
+          ./student_setup/macos/Start\ FlightLabFoam.command
+      - name: Build and inspect student downloads
+        run: |
+          ./student_setup/build_downloads.sh
+          unzip -t student_setup/downloads/FlightLabFoam-macOS.zip
+          unzip -t student_setup/downloads/FlightLabFoam-Windows.zip
+          unzip -t student_setup/downloads/FlightLabFoam-Linux.zip
+
+  windows:
+    name: Windows launcher
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - name: Run the student launcher twice (install, then reuse)
+        shell: cmd
+        env:
+          FLIGHTLABFOAM_TEST_ONLY: "1"
+          LOCALAPPDATA: ${{ runner.temp }}\flightlabfoam-student-test
+        run: |
+          call "student_setup\windows\Start FlightLabFoam.cmd"
+          call "student_setup\windows\Start FlightLabFoam.cmd"
+
+  linux:
+    name: Linux launcher
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - name: Run the student launcher twice (install, then reuse)
+        env:
+          FLIGHTLABFOAM_TEST_ONLY: "1"
+          XDG_DATA_HOME: ${{ runner.temp }}/flightlabfoam-student-test
+        run: |
+          bash "./student_setup/linux/Start FlightLabFoam.sh"
+          bash "./student_setup/linux/Start FlightLabFoam.sh"

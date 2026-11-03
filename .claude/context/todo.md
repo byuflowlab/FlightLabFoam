@@ -15,7 +15,7 @@
 ## Features
 - [x] Done 2026-10-23: Add an exit button top right. It stops the server through `/api/shutdown`.
 - [x] Done 2026-10-23: Checks to make sure that the spar slots and lightening holes don't intersect the surface opposite from entry (cutting the airfoil in half). `checks.feature_checks` warns on a breakthrough of either skin, on walls thinner than the minimum-wall setting, and on features intersecting each other.
-- [ ] Double-click student launchers per OS, like flightlab's `student_setup/`.
+- [x] Done 2026-11-03: Double-click student launchers per OS, like flightlab's `student_setup/`. Built and tested locally; not live until the repo is public and a commit is promoted (see `student_setup/RELEASE_CHECKLIST.md`).
 - [ ] Two panels from one block, stacked or nested, with a collision check.
 - [ ] Kerf that depends on the local wire speed, instead of one value per end.
 - [ ] A separate kerf for the trailing edge, where the thin tail melts back more than the surfaces do. Build it after block 2 and test it on block 3.

@@ -30,16 +30,21 @@ class Machine:
     carriage_separation: float = 773.1125
     travel_horizontal: float = 600.0  # mm of X (and A) travel
     travel_vertical: float = 300.0  # mm of Y (and Z) travel
+    # mm the carriages may go below program zero (Y, Z) before it is an error; any amount warns
+    max_below_zero: float = 50.0
     xy_carriage_side: str = "left"  # side of the X/Y carriage, seen from the X0 end looking along +X
     # how the controller turns F into axis speeds. xy: F is the X/Y carriage speed; xyz: F is
     # the speed along X, Y and Z with A following; all: F is the speed of the 4-axis vector.
-    # Confirm with a timed straight move on the real machine.
-    feed_model: str = "xy"
+    # The ME 415 Mach3 setup is "all": a swept lead-in written for "xy" (F5.4) crawled, and
+    # ran well at F120. Confirm with the timed moves in calibration/README.md.
+    feed_model: str = "all"
     max_feed: float = 600.0  # mm/min; faster moves are flagged
     min_wall_thickness: float = 2.0  # mm; thinner foam between a feature and a skin or another feature is flagged
     # mm; a design whose trailing edge is thickened to less than this is flagged, since a thinner
     # edge melts away and shortens the chord. 1 mm from the first cuts; refine with block 2.
     min_te_thickness: float = 1.0
+    # mm; a thicker trailing edge is flagged too, since it starts to look blunt
+    max_te_thickness: float = 2.0
     heat_on_code: str = "M3"
     heat_off_code: str = "M5"
 
@@ -75,8 +80,12 @@ class Settings:
             raise ValueError("travel limits and maximum feed must be positive")
         if m.min_wall_thickness < 0:
             raise ValueError("the minimum wall thickness cannot be negative")
+        if m.max_below_zero < 0:
+            raise ValueError("the distance allowed below program zero cannot be negative")
         if m.min_te_thickness < 0:
             raise ValueError("the minimum trailing-edge thickness cannot be negative")
+        if m.max_te_thickness < m.min_te_thickness:
+            raise ValueError("the maximum trailing-edge thickness cannot be less than the minimum")
 
 
 def settings_path() -> Path:

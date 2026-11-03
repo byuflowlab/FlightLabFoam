@@ -29,6 +29,7 @@ function renderSettings() {
     n('carriage_separation', 'Carriage separation', 'len'),
     n('travel_horizontal', 'Horizontal travel (X, A)', 'len'),
     n('travel_vertical', 'Vertical travel (Y, Z)', 'len'),
+    n('max_below_zero', 'Allowed below program zero (Y, Z)', 'len'),
     field('X/Y carriage is on the', selectInput([['left', 'left'], ['right', 'right']], () => m.xy_carriage_side, v => { m.xy_carriage_side = v; })),
     field('Controller applies F to', selectInput([
       ['xy', 'the X/Y carriage'],
@@ -38,10 +39,11 @@ function renderSettings() {
     n('max_feed', 'Maximum feed', 'feed'),
     n('min_wall_thickness', 'Minimum foam wall', 'len'),
     n('min_te_thickness', 'Minimum trailing edge', 'len'),
+    n('max_te_thickness', 'Maximum trailing edge', 'len'),
     t('heat_on_code', 'Heat on code'),
     t('heat_off_code', 'Heat off code'),
     h('p', { class: 'hint', style: 'grid-column: 1 / -1' },
-      'The minimum foam wall is the thinnest foam allowed between a spar or hole and the skin, or between two of them. A trailing edge thinner than the minimum trailing edge tends to melt away. The carriage side is seen standing at the entry side of the machine, looking along +X. Check how F is applied with a timed straight move: a 50 mm move at F120 should take 25 s if F is the carriage speed.'),
+      'The minimum foam wall is the thinnest foam allowed between a spar or hole and the skin, or between two of them. A trailing edge thinner than the minimum tends to melt away, and one thicker than the maximum looks blunt; either gets a warning. A carriage going below program zero gets a warning, and an error past the allowed distance. The carriage side is seen standing at the entry side of the machine, looking along +X. Check how F is applied with a timed straight move: a 50 mm move at F120 should take 25 s if F is the carriage speed.'),
   );
 }
 

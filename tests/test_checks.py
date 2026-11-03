@@ -95,3 +95,32 @@ def test_trailing_edge_thinner_than_the_machine_minimum_is_a_warning(design, set
     assert any("trailing edge is only 1 mm" in m for m in messages(design, settings))
     design.cut.te_min_thickness = 1.5
     assert not any("trailing edge is only" in m for m in messages(design, settings))
+
+
+def test_carriage_below_program_zero_warns_then_errors(design, settings):
+    from flightlabfoam.model import Block
+
+    def levels(y):
+        design.blocks = [Block(machine_y=y)]
+        tp = toolpath.build(design, settings, 0)
+        return {c["level"] for c in check(tp, design, settings) if "below program zero" in c["message"]}
+
+    assert levels(0.0) == set()
+    assert levels(-20.0) == {"warning"}
+    assert levels(-100.0) == {"error"}
+    settings.machine.max_below_zero = 150.0
+    assert levels(-100.0) == {"warning"}
+
+
+def test_trailing_edge_thicker_than_the_machine_maximum_is_a_warning(design, settings):
+    design.cut.te_min_thickness = 3.0
+    assert any("starts to look blunt" in m for m in messages(design, settings))
+    design.cut.te_min_thickness = 2.0
+    assert not any("blunt" in m for m in messages(design, settings))
+
+
+def test_trailing_edge_thicker_than_the_machine_maximum_is_a_warning(design, settings):
+    design.cut.te_min_thickness = 3.0
+    assert any("starts to look blunt" in m for m in messages(design, settings))
+    design.cut.te_min_thickness = 2.0
+    assert not any("blunt" in m for m in messages(design, settings))

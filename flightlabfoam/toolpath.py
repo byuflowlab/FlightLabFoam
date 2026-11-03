@@ -198,7 +198,8 @@ def _feeds(xy, az, root, tip, kind, cut, machine):
     faster or slower carriage). F is then the speed the controller must be told so
     that move takes that long, measured the way the machine profile says the
     controller measures it: along the X/Y carriage's path, over the X, Y and Z axes
-    with A following, or over all four axes.
+    with A following, or over all four axes. Exit moves hold the faster carriage at
+    the exit speed.
     """
     k = len(xy)
     feed = np.zeros(k)
@@ -217,11 +218,13 @@ def _feeds(xy, az, root, tip, kind, cut, machine):
             ctrl = float(np.hypot(np.hypot(d_xy[0], d_xy[1]), d_az[1]))
             if ctrl < 1e-12:
                 ctrl = abs(float(d_az[0]))
+        l_xy, l_az = float(np.linalg.norm(d_xy)), float(np.linalg.norm(d_az))
         if kind[i] == "exit":
-            f = cut.exit_feed
-            minutes = ctrl / f
+            # the faster carriage leaves at the exit speed; on a swept panel the carriages travel
+            # very different distances, and F alone would drive the other one far too fast
+            minutes = max(l_xy, l_az) / cut.exit_feed
+            f = ctrl / minutes if minutes > 0 else cut.exit_feed
         else:
-            l_xy, l_az = float(np.linalg.norm(d_xy)), float(np.linalg.norm(d_az))
             ref = {
                 "root": float(np.linalg.norm(root[i] - prev_r)),
                 "tip": float(np.linalg.norm(tip[i] - prev_t)),

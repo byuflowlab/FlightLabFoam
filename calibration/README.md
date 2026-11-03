@@ -1,6 +1,6 @@
 # Calibration cuts
 
-The same three test panels are cut in each of two foam blocks. Each set measures the kerf and the true carriage separation, all at 120 mm/min, and two blocks show whether the results repeat. `make_tests.py` builds them (`uv run python calibration/make_tests.py`), writing a G-code file per test and a `.foam.json` that opens it in the app. Rebuild them after changing the settings, since the swept panels depend on the carriage separation.
+The same three test panels are cut in each of two foam blocks. Each set measures the kerf and the true carriage separation, all at F120 (about 85 mm/min per carriage), and two blocks show whether the results repeat. `make_tests.py` builds them (`uv run python calibration/make_tests.py`), writing a G-code file per test and a `.foam.json` that opens it in the app. Rebuild them after changing the settings, since the swept panels depend on the carriage separation.
 
 | Block | Size: front to back × along the wire × tall | Files |
 |---|---|---|
@@ -79,15 +79,45 @@ The separation is a straight-line fit of measured against drawn Δ over all the 
 |---|---|---|
 | 2026-10-30, student main wing (weight 0.5) | 0.76 mm (0.51–1.01) | – (no sweep) |
 | 2026-10-31, block 1 | 0.92 mm (0.75–1.25) | 769.3 ± 3.8 mm (set to 773.1) |
-| All, weighted | 0.86 mm | 769.3 ± 3.8 mm |
+| 2026-11-02, block 2 (to be remeasured) | 0.76 mm (0.35–1.15); parts 1.08, voids 0.44 | 797.0 ± 4.1 mm (set to 773.1) |
+| All, weighted | 0.82 mm | 782.2 ± 2.8 mm |
 
 Block 1 agrees with the measured 773.1 mm within its uncertainty. Every void's leading edge came out 1–4 mm (mostly 2 mm) shallower than drawn plus kerf, at both depths alike, so it is not the separation: either the block face sat a little past X0, or the wire lags and rounds the leading edge where it turns.
 
+Block 2 disagrees with block 1 by about 5σ, almost all of it from one reading: test B's leading edge at the X/Y end, 193 mm, 4.6 mm shallower than drawn when every other block 2 depth is within 2.6 mm. The block is being remeasured before either separation is used, so the combined 782 mm means nothing yet. Where the block sat between the carriages can't cause this: sliding it along the wire moves both leading edges of a swept panel by the same amount (about 2.2 mm per 10 mm of shift), so Δ doesn't change. The pattern of B and C depths suggests each block sat 3–5 mm off-centre, which is within the reading error.
+
+Block 2's kerf estimates split: the parts imply about 1.1 mm, the voids about 0.4 mm, and part plus void thickness comes to 17.1–17.6 mm where 18.6 is expected. Squeezing the foam would do that. All three parts kept their chord to within 1 mm, with 1, 2 and 3 mm trailing edges, so a 1 mm trailing edge is enough. That's now the minimum, and the app warns above 2 mm, where the tail starts to look blunt. The parts' trailing-edge thicknesses weren't measured.
+
 The student wing was a real cut, not a test panel. An undergraduate measured it, so it counts half. Its void readings and leading-edge depths are left out: with a 2.9 mm cut-in, the foam above and below the wing is nearly cut free, so the void closes up and the depth is just the block's. Its part thicknesses agree with block 1, but only if they were read across the chord line. If they were read as the cambered section's height lying flat, its kerf is about 0.7 mm higher.
 
-Both runs lost 6–9 mm of part chord, with kerf compensation (the wing) and without it (block 1). So the loss isn't kerf. It's the thin trailing edge melting away, which compensation doesn't fix.
+Block 1 and the student wing lost 6–9 mm of part chord, with kerf compensation (the wing) and without it (block 1), with 0.5 mm trailing edges. So the loss isn't kerf. It's the thin trailing edge melting away, which block 2's thicker trailing edges fixed.
 
 If two blocks agree, set the kerf offset and the carriage separation to their means. If they disagree by more than the measurement error, something drifted between cuts, such as wire heat or tension, and is worth finding before going further.
+
+## Feed model check
+
+How the controller turns F into carriage speeds is the ☰ setting "Controller applies F to". It is set to `all` (F over all four axes). Blocks 1 and 2 were generated with `xy`, and test C's lead-in, written as F5.4, crawled; run by hand at F120 it cut well, which is what `all` predicts. Under `all`, F120 with both carriages moving equally gives each carriage about 85 mm/min, which is the speed blocks 1 and 2 were cut at and the app's default cutting speed.
+
+The timing test below hasn't been run. It would confirm the setting:
+
+To settle it, run this with the wire cold and no foam, and time each move:
+
+```
+G21
+G17
+G90
+G1X50.0000Y0.0000A50.0000Z0.0000F120.0000
+G1X50.0000Y50.0000A50.0000Z50.0000
+G1X0.0000Y0.0000A0.0000Z0.0000F300.0000
+```
+
+| Setting | First move (X and A, 50 mm each) | Second move (Y and Z, 50 mm each) |
+|---|---|---|
+| `xy`: F is the X/Y carriage speed | 25 s | 25 s |
+| `xyz`: F over X, Y and Z, A follows | 25 s | 35 s |
+| `all`: F over all four axes | 35 s | 35 s |
+
+Set the one that matches. Every file needs regenerating afterwards.
 
 ## Why it works
 

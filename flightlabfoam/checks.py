@@ -55,8 +55,14 @@ def check(tp: Toolpath, design: Design, settings: Settings) -> list[dict]:
             warn(f"the {name} carriage goes to {h} = {pts[:, 0].min():.1f} mm, behind program zero")
         if pts[:, 0].max() > m.travel_horizontal + _TOL:
             error(f"the {name} carriage needs {h} = {pts[:, 0].max():.1f} mm but travels only {m.travel_horizontal:g} mm")
-        if pts[:, 1].min() < -_TOL:
-            error(f"the {name} carriage goes to {v} = {pts[:, 1].min():.1f} mm, below program zero")
+        low = float(pts[:, 1].min())
+        if low < -m.max_below_zero - _TOL:
+            error(
+                f"the {name} carriage goes to {v} = {low:.1f} mm, more than the {m.max_below_zero:g} mm "
+                "allowed below program zero"
+            )
+        elif low < -_TOL:
+            warn(f"the {name} carriage goes to {v} = {low:.1f} mm, below program zero; check it has room to go there")
         if pts[:, 1].max() > m.travel_vertical + _TOL:
             error(f"the {name} carriage needs {v} = {pts[:, 1].max():.1f} mm but travels only {m.travel_vertical:g} mm")
 
@@ -71,12 +77,21 @@ def check(tp: Toolpath, design: Design, settings: Settings) -> list[dict]:
             )
 
     cut = design.cut
-    if tp.feed.max() > m.max_feed:
-        warn(f"F reaches {tp.feed.max():.0f} mm/min, above the machine limit of {m.max_feed:g} mm/min")
+    # judge the carriages' real speeds, not F: how F maps to them depends on the feed model
+    minutes = np.maximum(tp.seconds / 60.0, 1e-12)
+    prev = lambda a: np.vstack([[0.0, 0.0], a[:-1]])
+    speed = np.maximum(np.linalg.norm(tp.xy - prev(tp.xy), axis=1), np.linalg.norm(tp.az - prev(tp.az), axis=1)) / minutes
+    if speed.max() > m.max_feed:
+        warn(f"a carriage reaches {speed.max():.0f} mm/min, above the machine limit of {m.max_feed:g} mm/min")
     if cut.te_min_thickness < m.min_te_thickness - _TOL:
         warn(
             f"the trailing edge is only {cut.te_min_thickness:g} mm thick; on this machine an edge thinner than "
             f"{m.min_te_thickness:g} mm tends to melt away and shorten the chord (Cutting settings)"
+        )
+    elif cut.te_min_thickness > m.max_te_thickness + _TOL:
+        warn(
+            f"the trailing edge is {cut.te_min_thickness:g} mm thick; above {m.max_te_thickness:g} mm it starts "
+            "to look blunt (Cutting settings)"
         )
     if cut.kerf_root == 0 and cut.kerf_tip == 0:
         out.append({"level": "info", "message": "kerf is zero, so the part will come out slightly undersize"})

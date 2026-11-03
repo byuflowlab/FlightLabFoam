@@ -11,7 +11,10 @@ block:
 conditions:
   heat_setting: null
   wire: null  # diameter or gauge, tension
-  notes: null
+  notes: >-
+    Generated with the feed model set to xy, but the controller turned out to apply F over
+    all four axes (2026-11-02). So the airfoil cuts ran at F120 split between the carriages,
+    about 85 mm/min each, not 120; test C's lead-in, written as F5.4, crawled.
 measured_with: {tool: ruler, resolution: 1.0}
 # the machine settings the G-code was generated with
 settings:

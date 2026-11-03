@@ -6,7 +6,8 @@
 - [ ] Cut an asymmetric test panel to confirm `xy_carriage_side` and left/right handedness.
 - [x] Done 2026-10-27: Measure carriage separation. 30.4375 in = 773.1125 mm, now the default in `settings.py` and `settings.yaml`.
 - [x] Done 2026-10-31: Cut block 1 (kerf off, 0.5 mm trailing edge). Kerf ≈ 0.9 mm, separation 769 ± 4 mm, and the tail melted where the part was under about 1 mm thick. Recorded in `calibration/runs/`, with a student's main wing at half weight.
-- [ ] Cut block 2 (kerf compensation 0.9 mm, trailing edges 1/2/3 mm), record it in `calibration/runs/`, and set the default kerf offset, carriage separation and minimum trailing edge (now 1 mm, design and setting) from the results.
+- [x] Done 2026-11-02: Cut block 2 (kerf compensation 0.9 mm, trailing edges 1/2/3 mm) and record it in `calibration/runs/`. All three parts kept their chord, so the minimum trailing edge stays 1 mm (warning above 2 mm).
+- [ ] Remeasure block 2 (2026-11-03), rerun `analyze.py`, then set the default kerf offset (block 2 parts suggest about 1.1 mm) and carriage separation (block 1 769 vs block 2 797 mm, unresolved).
 - [ ] Design a validation cut for block 3 (165 × 305 × 50.8 mm) once the results are in: a tapered panel with kerf compensation on, measured against its design. If block 2 goes well, use block 3 to test a separate trailing-edge kerf as well (see Features).
 - [ ] Measure the axis travel.
 - [ ] Cut a tapered test panel to calibrate kerf at the slow and fast ends.

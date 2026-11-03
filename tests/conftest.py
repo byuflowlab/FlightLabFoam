@@ -20,7 +20,9 @@ def client(settings_path):
 
 @pytest.fixture
 def settings():
-    return Settings()
+    s = Settings()
+    s.machine.feed_model = "xy"  # the expected F values in the tests are written for this model
+    return s
 
 
 @pytest.fixture

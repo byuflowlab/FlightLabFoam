@@ -1,7 +1,7 @@
 """Build the calibration cuts: three panels per foam block, for blocks 1 and 2.
 
 In each block, three panels are stacked in its thickness, each running the block's full
-length along the wire, all at 120 mm/min:
+length along the wire, all at F120 (85 mm/min per carriage on this machine):
 
 * A, straight: measures kerf, and whether the entry face is square to the wire.
 * B, swept aft by 100 mm, and C, swept forward by 100 mm: together they measure the
@@ -37,7 +37,7 @@ CUT = {  # per block: kerf compensation (mm), and trailing-edge thickness (mm) f
 AIRFOIL, CHORD = "naca0015", 50.0  # 7.5 mm thick
 SWEEP = 100.0  # leading-edge offset of the tip end for tests B and C
 CUT_IN = 45.0  # keeps both carriages ahead of program zero on the swept panels
-FEED = 120.0
+FEED = 85.0  # mm/min per carriage: F120 with the controller applying F over all four axes
 TESTS = [  # name, tip sweep (mm), panel centre above the block's centre (mm)
     ("test-A-straight", 0.0, 15.0),  # top
     ("test-B-sweep-aft", SWEEP, 0.0),  # middle

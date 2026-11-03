@@ -116,3 +116,13 @@ def test_block_behind_program_zero_is_an_error(design, settings):
     design.blocks = [type(design.block(0))(machine_x=-5.0)]
     tp = toolpath.build(design, settings, 0)
     assert any(c["level"] == "error" and "behind program zero" in c["message"] for c in check(tp, design, settings))
+
+
+def test_exit_holds_the_faster_carriage_at_the_exit_speed(design, settings):
+    design.sections[1].x_le = 300.0  # strongly swept: the carriages travel very different distances
+    tp = toolpath.build(design, settings, 0)
+    prev = lambda a: np.vstack([[0, 0], a[:-1]])
+    fast = np.maximum(np.linalg.norm(tp.xy - prev(tp.xy), axis=1), np.linalg.norm(tp.az - prev(tp.az), axis=1))
+    exits = np.array([k == "exit" for k in tp.kind]) & (fast > 1e-6)
+    assert exits.any()
+    assert np.allclose(fast[exits] / (tp.seconds[exits] / 60), design.cut.exit_feed)

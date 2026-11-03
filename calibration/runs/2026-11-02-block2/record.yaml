@@ -1,0 +1,69 @@
+# One calibration run: a foam block and the cuts made in it.
+# Lengths are mm. Each measurement is a list of readings; extra readings are repeats,
+# by the same person or someone else. null means not recorded.
+
+date: 2026-11-02  # the day the measurements came in; the cut date was not recorded
+# to be remeasured 2026-11-03 as a check
+block:
+  name: block2
+  size: {front_to_back: 200.0, along_wire: 457.0, tall: 50.8}
+  foam: null
+  ends: {left: xy, right: az}  # which carriage each end of the block faced (assumed, as block 1)
+conditions:
+  heat_setting: null
+  wire: null
+  notes: >-
+    Kerf compensation 0.9 mm; trailing edges 1, 2 and 3 mm on tests A, B and C. Cut at F120
+    like block 1, which on this machine (F applied over all four axes) is about 85 mm/min per
+    carriage. The files were generated with the feed model set to xy, so test C's lead-in was
+    written as F5.4; it was edited to F120 by hand before cutting. The designs here are
+    regenerated (only the feeds differ from what was cut); the G-code as cut was not kept.
+    The wire never left the block. Where the block sat between the carriages wasn't recorded;
+    it doesn't change the separation, and the depths suggest it was 3-5 mm off-centre.
+measured_with: {tool: ruler, resolution: 1.0}  # decimals were estimated between the mm marks
+settings:
+  units: mm
+  machine:
+    name: ME 415 foam cutter
+    dialect: mach3_xyaz
+    carriage_separation: 773.1125
+    travel_horizontal: 600.0
+    travel_vertical: 300.0
+    xy_carriage_side: left
+    feed_model: xy
+    max_feed: 600.0
+    min_wall_thickness: 2.0
+    heat_on_code: M3
+    heat_off_code: M5
+app_version: 19f265b
+
+# part_*: the airfoil that came out; void_*: the airfoil-shaped hole left in the block.
+# le_depth: from the entry face to the leading-edge tip of the void.
+tests:
+  A:
+    design: test-A-straight.foam.json
+    gcode: null
+    part_chord: {left: [49.5], right: [49.6]}
+    part_thickness: {left: [7.1], right: [7.5]}
+    part_te_thickness: null
+    void_thickness: {left: [10], right: [10]}
+    le_depth: {left: [95], right: [95]}
+    notes: null
+  B:
+    design: test-B-sweep-aft.foam.json
+    gcode: null
+    part_chord: {left: [49.0], right: [50]}
+    part_thickness: {left: [7.2], right: [7.1]}
+    part_te_thickness: null
+    void_thickness: {left: [10.5], right: [10]}
+    le_depth: {left: [193], right: [97]}
+    notes: null
+  C:
+    design: test-C-sweep-forward.foam.json
+    gcode: null
+    part_chord: {left: [50], right: [49.5]}
+    part_thickness: {left: [7.0], right: [7.0]}
+    part_te_thickness: null
+    void_thickness: {left: [10.1], right: [10.5]}
+    le_depth: {left: [98], right: [196]}
+    notes: null

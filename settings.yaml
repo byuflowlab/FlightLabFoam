@@ -7,10 +7,12 @@ machine:
   carriage_separation: 773.1125
   travel_horizontal: 600.0
   travel_vertical: 300.0
+  max_below_zero: 50.0
   xy_carriage_side: left
-  feed_model: xy
+  feed_model: all
   max_feed: 600.0
   min_wall_thickness: 2.0
-  min_te_thickness: 0.5
+  min_te_thickness: 1.0
+  max_te_thickness: 2.0
   heat_on_code: M3
   heat_off_code: M5

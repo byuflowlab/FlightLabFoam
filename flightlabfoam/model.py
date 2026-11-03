@@ -111,9 +111,11 @@ class ControlCut:
 class CutSettings:
     heat_control: bool = False  # write heat on/off codes into the file
     heat_dwell_s: float = 0.0  # pause after heat-on so the wire reaches temperature
-    feed: float = 120.0  # cutting speed, mm/min
+    # cutting speed, mm/min. 85 is what F120 gives each carriage on the ME 415 machine, which
+    # applies F over all four axes; it is the speed the calibration blocks were cut at
+    feed: float = 85.0
     feed_basis: str = "faster_carriage"  # root | tip | faster_carriage | slower_carriage
-    exit_feed: float = 240.0  # mm/min, the move back out of the block
+    exit_feed: float = 170.0  # mm/min, the move back out of the block (F240 on the ME 415 machine)
     entry: str = "trailing"  # trailing | leading: which edge the wire reaches first
     kerf_root: float = 0.0  # path offset outside the root section
     kerf_tip: float = 0.0  # path offset outside the tip section

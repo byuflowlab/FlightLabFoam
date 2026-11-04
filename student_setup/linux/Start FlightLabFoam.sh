@@ -15,7 +15,7 @@ set -u
 set -o pipefail
 
 FLIGHTLABFOAM_DEFAULT_COMMIT="cc14eb49dc85fbac4482cbb93a0be939c11e7a87"
-FLIGHTLABFOAM_RELEASE_URL="https://raw.githubusercontent.com/Cardoza2/FlightLabFoam/master/student_setup/release.txt"
+FLIGHTLABFOAM_RELEASE_URL="https://raw.githubusercontent.com/byuflowlab/FlightLabFoam/master/student_setup/release.txt"
 FLIGHTLABFOAM_DATA_ROOT="${XDG_DATA_HOME:-${HOME}/.local/share}/flightlabfoam"
 FLIGHTLABFOAM_UV_DIR="${FLIGHTLABFOAM_DATA_ROOT}/uv"
 FLIGHTLABFOAM_UV="${FLIGHTLABFOAM_UV_DIR}/uv"
@@ -95,7 +95,7 @@ if [[ -f "${FLIGHTLABFOAM_INSTALLED_FILE}" ]]; then
 fi
 
 if [[ ! -x "${FLIGHTLABFOAM_PYTHON}" || "${FLIGHTLABFOAM_INSTALLED}" != "${FLIGHTLABFOAM_COMMIT}" ]]; then
-    FLIGHTLABFOAM_REQUIREMENT="flightlabfoam[pinned] @ https://github.com/Cardoza2/FlightLabFoam/archive/${FLIGHTLABFOAM_COMMIT}.zip"
+    FLIGHTLABFOAM_REQUIREMENT="flightlabfoam[pinned] @ https://github.com/byuflowlab/FlightLabFoam/archive/${FLIGHTLABFOAM_COMMIT}.zip"
     echo "Installing build ${FLIGHTLABFOAM_COMMIT:0:8}..."
     echo "The first install downloads Python and FlightLabFoam's libraries (about 60 MB)"
     echo "and can take a few minutes. Later updates reuse what is already downloaded."

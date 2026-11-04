@@ -12,7 +12,7 @@ rem again until the instructor promotes a new build. The machine settings live
 rem in the same folder, outside the environment, so updates keep them.
 
 set "FLIGHTLABFOAM_DEFAULT_COMMIT=cc14eb49dc85fbac4482cbb93a0be939c11e7a87"
-set "FLIGHTLABFOAM_RELEASE_URL=https://raw.githubusercontent.com/Cardoza2/FlightLabFoam/master/student_setup/release.txt"
+set "FLIGHTLABFOAM_RELEASE_URL=https://raw.githubusercontent.com/byuflowlab/FlightLabFoam/master/student_setup/release.txt"
 set "FLIGHTLABFOAM_DATA_ROOT=%LOCALAPPDATA%\FlightLabFoam"
 set "FLIGHTLABFOAM_UV_DIR=%FLIGHTLABFOAM_DATA_ROOT%\uv"
 set "FLIGHTLABFOAM_UV=%FLIGHTLABFOAM_UV_DIR%\uv.exe"
@@ -63,7 +63,7 @@ if not "%FLIGHTLABFOAM_INSTALLED%"=="%FLIGHTLABFOAM_COMMIT%" goto install
 goto run
 
 :install
-set "FLIGHTLABFOAM_REQUIREMENT=flightlabfoam[pinned] @ https://github.com/Cardoza2/FlightLabFoam/archive/%FLIGHTLABFOAM_COMMIT%.zip"
+set "FLIGHTLABFOAM_REQUIREMENT=flightlabfoam[pinned] @ https://github.com/byuflowlab/FlightLabFoam/archive/%FLIGHTLABFOAM_COMMIT%.zip"
 echo Installing build %FLIGHTLABFOAM_COMMIT:~0,8%...
 echo The first install downloads Python and FlightLabFoam's libraries (about 60 MB)
 echo and can take a few minutes. Later updates reuse what is already downloaded.

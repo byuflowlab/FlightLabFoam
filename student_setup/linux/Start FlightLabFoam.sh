@@ -14,7 +14,7 @@
 set -u
 set -o pipefail
 
-FLIGHTLABFOAM_DEFAULT_COMMIT="cc14eb49dc85fbac4482cbb93a0be939c11e7a87"
+FLIGHTLABFOAM_DEFAULT_COMMIT="63839bb765f2f1d9e78cf3d953b3f0b97849850a"
 FLIGHTLABFOAM_RELEASE_URL="https://raw.githubusercontent.com/byuflowlab/FlightLabFoam/master/student_setup/release.txt"
 FLIGHTLABFOAM_DATA_ROOT="${XDG_DATA_HOME:-${HOME}/.local/share}/flightlabfoam"
 FLIGHTLABFOAM_UV_DIR="${FLIGHTLABFOAM_DATA_ROOT}/uv"

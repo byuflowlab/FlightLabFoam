@@ -11,7 +11,7 @@ rem start that installed copy directly, so nothing is downloaded or re-resolved
 rem again until the instructor promotes a new build. The machine settings live
 rem in the same folder, outside the environment, so updates keep them.
 
-set "FLIGHTLABFOAM_DEFAULT_COMMIT=cc14eb49dc85fbac4482cbb93a0be939c11e7a87"
+set "FLIGHTLABFOAM_DEFAULT_COMMIT=63839bb765f2f1d9e78cf3d953b3f0b97849850a"
 set "FLIGHTLABFOAM_RELEASE_URL=https://raw.githubusercontent.com/byuflowlab/FlightLabFoam/master/student_setup/release.txt"
 set "FLIGHTLABFOAM_DATA_ROOT=%LOCALAPPDATA%\FlightLabFoam"
 set "FLIGHTLABFOAM_UV_DIR=%FLIGHTLABFOAM_DATA_ROOT%\uv"

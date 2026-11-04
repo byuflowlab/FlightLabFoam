@@ -6,7 +6,7 @@ Note: This build targets the yellow foam cutter at BYU. If you're using a differ
 
 ## Student download
 
-No Git, Python, or terminal commands needed. Download the launcher for [macOS](student_setup/downloads/FlightLabFoam-macOS.zip), [Windows](student_setup/downloads/FlightLabFoam-Windows.zip), or [Linux](student_setup/downloads/FlightLabFoam-Linux.zip), unzip it, read **START HERE**, and double-click the launcher. The first launch downloads a private copy of Python and the app and takes a few minutes; later launches start in seconds and update automatically when a new build is promoted. Settings made from the ☰ menu are kept across updates. Instructors: see [student_setup/README.md](student_setup/README.md).
+No Git, Python, or terminal commands needed. Download the launcher for [macOS](https://github.com/byuflowlab/FlightLabFoam/raw/master/student_setup/downloads/FlightLabFoam-macOS.zip), [Windows](https://github.com/byuflowlab/FlightLabFoam/raw/master/student_setup/downloads/FlightLabFoam-Windows.zip), or [Linux](https://github.com/byuflowlab/FlightLabFoam/raw/master/student_setup/downloads/FlightLabFoam-Linux.zip), unzip it, read **START HERE**, and double-click the launcher. The first launch downloads a private copy of Python and the app and takes a few minutes; later launches start in seconds and update automatically when a new build is promoted. Settings made from the ☰ menu are kept across updates. Instructors: see [student_setup/README.md](student_setup/README.md).
 
 ## Quick start
 

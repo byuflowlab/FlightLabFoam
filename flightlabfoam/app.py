@@ -207,6 +207,9 @@ def _panel_json(design: Design, settings, panel: int, side: str) -> dict:
         "w_block": list(pl.w_block),
         "span": tp.ends.span,
         "spacing": tp.ends.spacing(),
+        "sections_local": [
+            {k: (_round(v) if isinstance(v, np.ndarray) else v) for k, v in end.items()} for end in tp.ends.local
+        ],
         "checks": checks.check(tp, design, settings),
     }
 

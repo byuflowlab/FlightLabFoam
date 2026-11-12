@@ -131,6 +131,20 @@
         <div class="form-grid" id="cutting-form"></div>
         <p class="hint">G-code is always written in millimetres. The feed basis says where the cutting speed is held: on the wing root or tip, or on the faster or slower carriage. On a tapered panel the other end moves slower, so it melts more; give it more kerf.</p>
       </div>
+      <div class="card view-card">
+        <div class="view-tabs" style="gap:20px">
+          <span class="view-tabs" id="cut-end-tabs">
+            <button data-view="0" class="on">Root</button>
+            <button data-view="1">Tip</button>
+          </span>
+          <span class="view-tabs" id="cut-zoom-tabs">
+            <button data-view="whole" class="on">Whole airfoil</button>
+            <button data-view="te">Trailing edge</button>
+          </span>
+        </div>
+        <div class="view" id="cut-view"></div>
+        <p class="hint">The airfoil as designed (dashed), the outline after the minimum thicknesses (shaded), and the path the wire follows, offset outside it by the kerf. Spars, holes and control cuts show on the path. The vertical line marks where the trailing-edge thickness starts.</p>
+      </div>
     </section>
 
     <section class="pane" data-pane="animation" hidden>

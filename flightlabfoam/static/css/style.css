@@ -98,6 +98,8 @@ main { padding: 0 16px 24px; display: block; }
 .field { display: flex; flex-direction: column; gap: 3px; color: var(--muted); font-size: 12.5px; }
 .field.grow { flex: 1; min-width: 200px; }
 .field.check { flex-direction: row; align-items: center; gap: 8px; color: var(--ink); font-size: 14px; }
+.field-warn { grid-column: 1 / -1; color: var(--warn); font-size: 12.5px; margin-top: -6px; }
+.field-warn:empty { display: none; }
 .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px 18px; align-items: end; }
 .form-grid h3 { grid-column: 1 / -1; font-size: 13px; margin: 6px 0 -4px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
 .unit { color: var(--muted); font-size: 12px; }

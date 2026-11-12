@@ -55,13 +55,16 @@ function toast(msg, isError) {
 // Everything is stored in mm and mm/min; these convert for display when units are inches.
 const Units = {
   get inch() { return state.settings && state.settings.units === 'in'; },
-  factor(kind) { return (kind === 'len' || kind === 'feed') && this.inch ? 25.4 : 1; },
+  factor(kind) {
+    if (kind === 'pct') return 0.01;  // stored as a fraction, shown as a percentage
+    return (kind === 'len' || kind === 'feed') && this.inch ? 25.4 : 1;
+  },
   toDisplay(v, kind) { return v / this.factor(kind); },
   fromDisplay(v, kind) { return v * this.factor(kind); },
   label(kind) {
     if (kind === 'len') return this.inch ? 'in' : 'mm';
     if (kind === 'feed') return this.inch ? 'in/min' : 'mm/min';
-    return { deg: '°', s: 's', frac: 'x/c' }[kind] || '';
+    return { deg: '°', s: 's', frac: 'x/c', pct: '% of chord' }[kind] || '';
   },
   fmt(v, kind, digits) {
     const d = digits !== undefined ? digits : (this.inch && (kind === 'len' || kind === 'feed') ? 3 : 1);

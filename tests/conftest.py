@@ -30,6 +30,7 @@ def design():
     """A straight one-panel wing with no kerf and a sharp trailing edge allowed."""
     d = Design()
     d.cut.te_min_thickness = 0.0
+    d.cut.min_thickness = 0.0
     d.cut.points_per_surface = 40
     return d
 
@@ -44,5 +45,6 @@ def tapered():
     d.sections[1].x_le = 50.0
     d.sections[1].twist = -3.0
     d.cut.te_min_thickness = 0.0
+    d.cut.min_thickness = 0.0
     d.cut.points_per_surface = 40
     return d

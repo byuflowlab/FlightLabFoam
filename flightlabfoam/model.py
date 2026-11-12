@@ -119,7 +119,13 @@ class CutSettings:
     entry: str = "trailing"  # trailing | leading: which edge the wire reaches first
     kerf_root: float = 0.0  # path offset outside the root section
     kerf_tip: float = 0.0  # path offset outside the tip section
-    te_min_thickness: float = 1.0  # the trailing edge is thickened to at least this; thinner melts away
+    # aft of the thickest point, the airfoil is made at least this thick
+    min_thickness: float = 1.0
+    # then the tail is held at this thickness, from the last station that was at least this thick,
+    # but over no more than the last te_extent of the chord (a fraction; 1 means no limit; default 5%)
+    te_min_thickness: float = 1.0
+    te_extent: float = 0.05
+    thicken_surface: str = "both"  # which surface moves out to add thickness: lower | upper | both (half each)
     points_per_surface: int = 80
     le_clustering: float = 1.25  # 1 = light, 1.25 = medium, 1.5 = strong; see airfoil.stations
     comment_header: bool = False
@@ -169,6 +175,12 @@ class Design:
                 )
         if self.cut.feed <= 0 or self.cut.exit_feed <= 0:
             raise ValueError("feed rates must be positive")
+        if self.cut.min_thickness < 0 or self.cut.te_min_thickness < 0:
+            raise ValueError("minimum thicknesses can't be negative")
+        if self.cut.thicken_surface not in ("lower", "upper", "both"):
+            raise ValueError("added thickness goes on the lower surface, the upper surface, or both")
+        if not 0.0 <= self.cut.te_extent <= 1.0:
+            raise ValueError("the trailing-edge thickness must cover between 0 and 100% of the chord")
         if not 10 <= self.cut.points_per_surface <= 400:
             raise ValueError("use between 10 and 400 points per surface")
         if not 1.0 <= self.cut.le_clustering <= 2.0:

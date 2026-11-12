@@ -126,3 +126,75 @@ def test_features_enter_from_the_bottom_by_default(design):
     # the upper surface, trailing edge to leading edge, is untouched
     assert np.allclose(cut.root[: cut.le_index + 1], plain.root[: plain.le_index + 1])
     assert len(cut.root) > len(plain.root)
+
+
+def _end(airfoil_name: str, chord: float, min_thick: float, te_min: float):
+    from flightlabfoam import airfoil
+    from flightlabfoam.geometry import _End
+
+    surf = airfoil.Surfaces.from_coords(airfoil.load(airfoil_name))
+    return _End(surf, chord, 0.0, 0.0, 0.0, te_min, min_thick, add_to="lower"), surf
+
+
+def test_minimum_thickness_moves_the_lower_surface_aft_of_the_thickest_point():
+    end, surf = _end("naca0012", 80.0, 3.0, 0.0)
+    x = np.linspace(0.0, 1.0, 801)
+    upper, lower = end.skin("upper", x), end.skin("lower", x)
+    np.testing.assert_allclose(upper, surf.upper(x) * 80.0)  # the upper surface is untouched
+    aft = x >= end.x_thick
+    assert np.all(upper[aft] - lower[aft] >= 3.0 - 1e-9)
+    assert np.all(lower <= surf.lower(x) * 80.0 + 1e-9)  # only ever moved down
+    # the leading edge, thinner than 3 mm near its tip, keeps its shape
+    np.testing.assert_allclose(lower[~aft], surf.lower(x[~aft]) * 80.0)
+
+
+def test_trailing_edge_is_flat_from_the_last_station_that_thick():
+    end, surf = _end("naca0012", 80.0, 1.0, 2.0)
+    t_raw = surf.thickness(end.x_te) * 80.0
+    assert t_raw == pytest.approx(2.0, abs=0.01)  # x_te is where the airfoil thins to 2 mm
+    x = np.linspace(end.x_te + 1e-6, 1.0, 200)
+    np.testing.assert_allclose(end.skin("upper", x) - end.skin("lower", x), 2.0)
+    ahead = np.linspace(end.x_thick, end.x_te - 1e-6, 200)
+    assert np.all(end.skin("upper", ahead) - end.skin("lower", ahead) >= 2.0 - 1e-6)
+
+
+def test_minimum_thickness_acts_before_the_trailing_edge():
+    # with the minimum above the trailing-edge thickness, nothing is left for the tail step
+    end, surf = _end("naca0012", 80.0, 2.0, 1.0)
+    assert end.x_te == 1.0
+    x = np.linspace(end.x_thick, 1.0, 400)
+    np.testing.assert_allclose(end.skin("upper", x), surf.upper(x) * 80.0)
+    assert end.skin("upper", 1.0) - end.skin("lower", 1.0) == pytest.approx(2.0)
+
+
+def test_trailing_edge_thickness_is_limited_to_the_last_part_of_the_chord():
+    from flightlabfoam import airfoil
+    from flightlabfoam.geometry import _End
+
+    surf = airfoil.Surfaces.from_coords(airfoil.load("naca0012"))
+    free = _End(surf, 80.0, 0.0, 0.0, 0.0, 2.0, 1.0)
+    assert free.x_te < 0.95  # unlimited, the 2 mm tail starts more than 5% from the end
+    end = _End(surf, 80.0, 0.0, 0.0, 0.0, 2.0, 1.0, te_extent=0.02)
+    assert end.x_te == pytest.approx(0.98)
+    x = np.linspace(0.981, 1.0, 50)
+    np.testing.assert_allclose(end.skin("upper", x) - end.skin("lower", x), 2.0)
+    ahead = np.linspace(free.x_te + 0.005, 0.975, 50)  # thinner than 2 mm but outside the limit
+    t = end.skin("upper", ahead) - end.skin("lower", ahead)
+    assert np.all(t < 2.0) and np.all(t >= 1.0 - 1e-9)
+
+
+@pytest.mark.parametrize("add_to, up_share", [("lower", 0.0), ("upper", 1.0), ("both", 0.5)])
+def test_added_thickness_goes_on_the_chosen_surface(add_to, up_share):
+    from flightlabfoam import airfoil
+    from flightlabfoam.geometry import _End
+
+    surf = airfoil.Surfaces.from_coords(airfoil.load("naca2412"))
+    end = _End(surf, 100.0, 0.0, 0.0, 0.0, 2.0, 1.0, te_extent=1.0, add_to=add_to)
+    x = np.linspace(0.0, 1.0, 801)
+    up0, lo0 = surf.upper(x) * 100.0, surf.lower(x) * 100.0
+    added = (end.skin("upper", x) - end.skin("lower", x)) - (up0 - lo0)
+    assert added.max() > 1.0  # the tail was thickened
+    np.testing.assert_allclose(end.skin("upper", x) - up0, up_share * added, atol=1e-9)
+    np.testing.assert_allclose(lo0 - end.skin("lower", x), (1 - up_share) * added, atol=1e-9)
+    tail = x > end.x_te
+    np.testing.assert_allclose((end.skin("upper", x) - end.skin("lower", x))[tail], 2.0)

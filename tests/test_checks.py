@@ -95,6 +95,9 @@ def test_trailing_edge_thinner_than_the_machine_minimum_is_a_warning(design, set
     assert any("trailing edge is only 1 mm" in m for m in messages(design, settings))
     design.cut.te_min_thickness = 1.5
     assert not any("trailing edge is only" in m for m in messages(design, settings))
+    design.cut.te_min_thickness = 0.5
+    design.cut.min_thickness = 1.5  # the minimum thickness holds the tail at 1.5 mm too
+    assert not any("trailing edge is only" in m for m in messages(design, settings))
 
 
 def test_carriage_below_program_zero_warns_then_errors(design, settings):

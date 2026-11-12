@@ -1,14 +1,14 @@
 # Calibration cuts
 
-The same three test panels are cut in each of two foam blocks. Each set measures the kerf and the true carriage separation, all at F120 (about 85 mm/min per carriage), and two blocks show whether the results repeat. `make_tests.py` builds them (`uv run python calibration/make_tests.py`), writing a G-code file per test and a `.foam.json` that opens it in the app. Rebuild them after changing the settings, since the swept panels depend on the carriage separation.
+The same three test panels are cut in each of two foam blocks. Each set measures the kerf and the true carriage separation, all at F120 (about 85 mm/min per carriage), and two blocks show whether the results repeat. A third block measures how the kerf changes with wire speed (see Block 3). `make_tests.py` builds them (`uv run python calibration/make_tests.py`), writing a G-code file per test and a `.foam.json` that opens it in the app. Rebuild them after changing the settings, since the swept panels depend on the carriage separation.
 
 | Block | Size: front to back × along the wire × tall | Files |
 |---|---|---|
 | 1 | 205 × 445 × 50.8 mm | `block1-test-*.nc` |
 | 2 | 200 × 457 × 50.8 mm | `block2-test-*.nc` |
-| 3 | 165 × 305 × 50.8 mm | kept for a validation cut, designed once the results are in |
+| 3 | 165 × 305 × 50.8 mm | `block3-test-*.nc`: kerf against wire speed, in two rounds |
 
-In each block:
+In blocks 1 and 2:
 
 | Test | Panel | Height in the block | Leading edge from the entry face, X/Y end → A/Z end |
 |---|---|---|---|
@@ -25,11 +25,39 @@ All of them are NACA 0015 sections, 50 mm chord and 7.5 mm thick, running the bl
 
 Block 1's parts came out 6–9 mm short in chord: the tail melted away back to where the part was under about 1 mm thick. Block 2 compensates for the kerf block 1 measured, so each part should come out at its drawn size, and thickens the trailing edge to a different value on each panel. With compensation on, the leading edges sit about 2 mm further in than the table above (96.8 and 196.8 mm), and block 2 is only 200 mm deep, so just 2 mm of foam is left behind the deepest one; handle it gently.
 
+## Block 3: kerf against wire speed
+
+On a tapered part the two ends of the wire move at different speeds, and the slower end melts away more foam, so the root and tip need different kerf compensation. The goal is to collect kerf at a range of speeds, fit whatever low-order function the data supports, and have the app suggest a root and tip kerf from the design and settings, which the user can always override. Block 3 adds speeds either side of the 85 mm/min of blocks 1 and 2.
+
+All three panels are NACA 0012, 80 mm chord (9.6 mm thick), with a 1 mm trailing edge and a 20 mm cut-in, running the block's full 305 mm along the wire.
+
+| Test | Panel | Height in the block | Wire speed, X/Y end / A/Z end | Kerf compensation | Round |
+|---|---|---|---|---|---|
+| A | straight | top, Y 34.7–46.1 mm | 50 / 50 mm/min | 0.9 mm | 1 |
+| B | straight | middle, Y 19.7–31.1 mm | 140 / 140 mm/min | 0.9 mm | 1 |
+| C | tapered, 80 mm root (X/Y end) to 45 mm tip, centred | bottom, Y about 4.6–16.2 mm | about 64 / 38 mm/min | from the round 1 fit | 2 |
+
+Round 1 is A and B. Each is untapered, so the whole wire runs at one speed and each panel is one clean kerf reading. Measure them, fit kerf against speed with the 85 mm/min data, and then build C with the root and tip kerf the fit suggests:
+
+```
+uv run python calibration/make_tests.py --taper-kerf ROOT TIP
+```
+
+C's faster (X/Y) carriage runs at 85 mm/min and the A/Z carriage at about 18 mm/min. Its two ends both check the fit and add two more speeds. Measured against its design, it is also the validation cut block 3 was held for.
+
+**Thin foam.** Foam may melt faster where the part is thin, which would show up as extra kerf over the long thin aft part of an airfoil. All three panels can show it, if the part thickness is read at several stations along the chord as well as at the thickest point (calipers, with a light touch). The drawn thicknesses of the straight panels, before kerf, are:
+
+| From the leading edge | 24 mm (thickest) | 40 mm | 56 mm | 64 mm | 72 mm |
+|---|---|---|---|---|---|
+| Drawn thickness | 9.6 mm | 8.5 mm | 5.9 mm | 4.2 mm | 2.3 mm |
+
+If the kerf comes out larger at the thin stations than at the thickest, by more than the reading error, then it depends on the local thickness as well as the speed.
+
 ## Setting up
 
-1. Lay the block with its long side along the wire (445 or 457 mm), its shorter side front to back (205 or 200 mm) and 50.8 mm vertical, centred between the carriages.
+1. Lay the block with its long side along the wire (445, 457 or 305 mm), its shorter side front to back (205, 200 or 165 mm) and 50.8 mm vertical, centred between the carriages.
 2. These cuts go trailing edge first, so the wire enters the face nearest the trailing edges. Zero the wire at the bottom edge of that face.
-3. Run the block's three files in any order, with the same wire heat for both blocks. Note the heat setting for the record.
+3. Run the block's three files in any order, with the same wire heat for every block. Note the heat setting for the record. Block 3 runs only A and B at first; C, at the bottom, is cut later, with the block put back and zeroed the same way.
 4. Mark each end of the block with the carriage it faced (X/Y or A/Z) before taking it off the machine.
 
 ## Measuring
@@ -80,7 +108,8 @@ The separation is a straight-line fit of measured against drawn Δ over all the 
 | 2026-10-30, student main wing (weight 0.5) | 0.76 mm (0.51–1.01) | – (no sweep) |
 | 2026-10-31, block 1 | 0.92 mm (0.75–1.25) | 769.3 ± 3.8 mm (set to 773.1) |
 | 2026-11-02, block 2 (to be remeasured) | 0.76 mm (0.35–1.15); parts 1.08, voids 0.44 | 797.0 ± 4.1 mm (set to 773.1) |
-| All, weighted | 0.82 mm | 782.2 ± 2.8 mm |
+| 2026-11-11, student horizontal tail (weight 0.5) | 1.12 mm (−0.40–2.40); parts 2.25, voids 0.00 | – (no leading-edge depths) |
+| All, weighted | 0.87 mm | 782.2 ± 2.8 mm |
 
 Block 1 agrees with the measured 773.1 mm within its uncertainty. Every void's leading edge came out 1–4 mm (mostly 2 mm) shallower than drawn plus kerf, at both depths alike, so it is not the separation: either the block face sat a little past X0, or the wire lags and rounds the leading edge where it turns.
 
@@ -91,6 +120,8 @@ Block 2's kerf estimates split: the parts imply about 1.1 mm, the voids about 0.
 The student wing was a real cut, not a test panel. An undergraduate measured it, so it counts half. Its void readings and leading-edge depths are left out: with a 2.9 mm cut-in, the foam above and below the wing is nearly cut free, so the void closes up and the depth is just the block's. Its part thicknesses agree with block 1, but only if they were read across the chord line. If they were read as the cambered section's height lying flat, its kerf is about 0.7 mm higher.
 
 Block 1 and the student wing lost 6–9 mm of part chord, with kerf compensation (the wing) and without it (block 1), with 0.5 mm trailing edges. So the loss isn't kerf. It's the thin trailing edge melting away, which block 2's thicker trailing edges fixed.
+
+The student horizontal tail (the Improved_Wing airplane, probably the left tail) is the second real cut, again measured by a student and counted half. The foam was squeezed while measuring, and it shows: the parts imply a kerf of 2.1–2.4 mm and the voids −0.4–0.4 mm, a wider split than block 2's, so only their mean means anything. Its void leading edges came out 4–7 mm shallower than expected, more than block 1's 1–4 mm. The parts came out 10–12 mm short in chord with a 1 mm trailing edge, which block 2 said was enough. Unlike block 2's 50 mm panels, these are 110–140 mm NACA 0012 sections, so the 1 mm minimum may not carry over to a longer, thinner tail; worth checking before relying on it.
 
 If two blocks agree, set the kerf offset and the carriage separation to their means. If they disagree by more than the measurement error, something drifted between cuts, such as wire heat or tension, and is worth finding before going further.
 

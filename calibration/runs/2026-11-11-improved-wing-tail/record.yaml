@@ -1,0 +1,69 @@
+# One calibration run: a foam block and the cuts made in it.
+# Lengths are mm. Each measurement is a list of readings; extra readings are repeats,
+# by the same person or someone else. null means not recorded.
+#
+# Not a calibration cut: a student team's horizontal tail (the Improved_Wing airplane), cut with
+# FlightLabFoam and measured afterwards. The airplane is Improved_Wing.flightlab.json; the tail
+# panel as cut is horizontal-tail.foam.json. Believed to be the left tail, not certain.
+
+date: 2026-11-11  # the day the measurements came in; the design is dated 2026-11-09, the cut date was not recorded
+measured_by: a student
+# Lower confidence than the calibration runs: a student's ruler readings, recorded in cm to one
+# decimal, on a real part. The foam was squeezed while measuring (the void thicknesses especially
+# are doubted). Counts half in the totals, like the student main wing.
+weight: 0.5
+block:
+  name: student horizontal tail
+  size: {front_to_back: 355.6, along_wire: 279.4, tall: 36.8}  # as set in the design
+  foam: null
+conditions:
+  heat_setting: null
+  wire: null
+  notes: >-
+    Trailing edge first with a 10 mm cut-in and kerf compensation of 1.0 mm at both ends,
+    1 mm minimum trailing edge. NACA 0012, 140 mm root chord tapering to 110 mm at 250 mm span,
+    leading edge swept back 30 mm, -0.3 deg twist, no spar. The block is 279.4 mm along the
+    wire, so each part end (the block face) lies 14.7 mm beyond the drawn panel end; there the
+    drawn chord is about 141.8 mm at the root and 108.2 mm at the tip, and analyze.py compares
+    against the panel ends (140 and 110 mm).
+    The student's sheet (measurements.md) first had the void labels swapped; corrected
+    2026-11-11. Void depth is from the entry face, where the cut-in starts, to the deepest
+    point of the void (its leading edge).
+    Wire speed at each block face, with the faster (A/Z, root) carriage at 85 mm/min: about
+    66 mm/min at the root face and 51 at the tip face, against 85 at both ends in blocks 1 and 2.
+measured_with: {tool: ruler, resolution: 1.0}
+# The settings the G-code was presumably generated with: the defaults in the student build.
+# The student's actual settings were not recorded.
+settings:
+  units: mm
+  machine:
+    name: ME 415 foam cutter
+    dialect: mach3_xyaz
+    carriage_separation: 773.1125
+    travel_horizontal: 600.0
+    travel_vertical: 300.0
+    max_below_zero: 50.0
+    xy_carriage_side: left
+    feed_model: all
+    max_feed: 600.0
+    min_wall_thickness: 2.0
+    min_te_thickness: 1.0
+    max_te_thickness: 2.0
+    heat_on_code: M3
+    heat_off_code: M5
+app_version: 63839bb (presumably; the first public student build)
+
+# Readings are labelled root and tip; ends says which carriage each faced. The left tail has its
+# root at the A/Z carriage.
+tests:
+  left:
+    design: horizontal-tail.foam.json
+    gcode: null
+    side: left
+    ends: {root: az, tip: xy}
+    part_chord: {root: [130], tip: [98]}
+    part_thickness: {root: [14], tip: [11]}
+    part_te_thickness: null
+    void_thickness: {root: [18], tip: [16]}  # squeezed while measuring
+    le_depth: {root: [148], tip: [117]}
+    notes: null

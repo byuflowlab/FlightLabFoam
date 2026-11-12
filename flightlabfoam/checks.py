@@ -83,14 +83,15 @@ def check(tp: Toolpath, design: Design, settings: Settings) -> list[dict]:
     speed = np.maximum(np.linalg.norm(tp.xy - prev(tp.xy), axis=1), np.linalg.norm(tp.az - prev(tp.az), axis=1)) / minutes
     if speed.max() > m.max_feed:
         warn(f"a carriage reaches {speed.max():.0f} mm/min, above the machine limit of {m.max_feed:g} mm/min")
-    if cut.te_min_thickness < m.min_te_thickness - _TOL:
+    te = max(cut.te_min_thickness, cut.min_thickness)  # the minimum thickness also holds the tail up
+    if te < m.min_te_thickness - _TOL:
         warn(
-            f"the trailing edge is only {cut.te_min_thickness:g} mm thick; on this machine an edge thinner than "
+            f"the trailing edge is only {te:g} mm thick; on this machine an edge thinner than "
             f"{m.min_te_thickness:g} mm tends to melt away and shorten the chord (Cutting settings)"
         )
-    elif cut.te_min_thickness > m.max_te_thickness + _TOL:
+    elif te > m.max_te_thickness + _TOL:
         warn(
-            f"the trailing edge is {cut.te_min_thickness:g} mm thick; above {m.max_te_thickness:g} mm it starts "
+            f"the trailing edge is {te:g} mm thick; above {m.max_te_thickness:g} mm it starts "
             "to look blunt (Cutting settings)"
         )
     if cut.kerf_root == 0 and cut.kerf_tip == 0:

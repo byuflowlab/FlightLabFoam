@@ -65,6 +65,9 @@ class PanelEnds:
     nominal_le: int  # leading-edge index of the nominal outlines
     skins: list[tuple[np.ndarray, np.ndarray]] = field(default_factory=list)  # per end: (upper, lower), section frame
     shapes: list[list[Shape]] = field(default_factory=list)  # per end: every feature's nominal outline
+    # per end, in the section frame (leading edge at the origin, untwisted, mm): the airfoil as
+    # drawn, the thickened outline, the cut path, and where each thickening step starts
+    local: list[dict] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
 
     def spacing(self) -> dict:
@@ -90,16 +93,52 @@ class _End:
     x_le: float
     twist: float
     te_min: float
+    min_thick: float = 0.0
+    te_extent: float = 1.0  # the tail step covers at most this fraction of the chord, from the trailing edge
+    add_to: str = "both"  # the surface that moves out to add thickness: lower | upper | both
+
+    def __post_init__(self):
+        """Find where the two thickening steps start, as chord fractions.
+
+        ``x_thick``: the thickest point. Only the part aft of it is thickened, so the
+        leading edge, where every airfoil is thin, keeps its shape.
+        ``x_te``: the last station, after the minimum thickness is applied, that is at least
+        ``te_min`` thick, moved aft if needed so the tail step covers no more than the last
+        ``te_extent`` of the chord. Aft of it the tail is held at ``te_min``. 1 when nothing is thinner.
+        """
+        g = np.linspace(0.0, 1.0, 4001)
+        t = self.surf.thickness(g) * self.chord
+        i = int(np.argmax(t))
+        self.x_thick = float(g[i])
+        t = np.where(g >= self.x_thick, np.maximum(t, self.min_thick), t)
+        self.x_te = 1.0
+        if self.te_min > 0:
+            thick = np.flatnonzero((g >= self.x_thick) & (t >= self.te_min))
+            j = int(thick[-1]) if len(thick) else i
+            if j < len(g) - 1:  # interpolate the crossing between j and j + 1
+                self.x_te = float(g[j] + (g[j + 1] - g[j]) * np.clip((t[j] - self.te_min) / (t[j] - t[j + 1]), 0.0, 1.0))
+            self.x_te = max(self.x_te, 1.0 - self.te_extent)
 
     def skin(self, side: str, x):
-        """Surface height in mm at chord fraction ``x``, with the trailing edge thickened."""
-        lower = self.surf.lower(x) * self.chord
-        if side == "lower":
-            return lower
-        upper = self.surf.upper(x) * self.chord
+        """Surface height in mm at chord fraction ``x``, thickened in two steps.
+
+        First the minimum thickness: aft of the thickest point, wherever the airfoil is thinner
+        than ``min_thick``, it is made that thick. Then the trailing edge: aft of ``x_te`` it is
+        made ``te_min`` thick, a tail of constant thickness. ``add_to`` says which surface moves
+        out to make the added thickness: the lower (down), the upper (up), or both, half each.
+        """
+        xa = np.asarray(x, dtype=float)
+        upper = self.surf.upper(xa) * self.chord
+        lower = self.surf.lower(xa) * self.chord
+        t = upper - lower
+        added = np.zeros_like(t)
+        if self.min_thick > 0:
+            added = np.where(xa >= self.x_thick, np.maximum(self.min_thick - t, 0.0), 0.0)
         if self.te_min > 0:
-            upper = np.where(np.asarray(x) >= 0.5, np.maximum(upper, lower + self.te_min), upper)
-        return upper
+            added = added + np.where(xa > self.x_te, np.maximum(self.te_min - (t + added), 0.0), 0.0)
+        up_share = {"lower": 0.0, "upper": 1.0, "both": 0.5}[self.add_to]
+        out = upper + up_share * added if side == "upper" else lower - (1.0 - up_share) * added
+        return float(out) if out.ndim == 0 else out
 
 
 @dataclass
@@ -134,6 +173,9 @@ def panel_ends(design: Design, panel: int) -> PanelEnds:
             s.x_le,
             s.twist,
             cut.te_min_thickness,
+            cut.min_thickness,
+            cut.te_extent,
+            cut.thicken_surface,
         )
         for s, kerf in ((s_root, cut.kerf_root), (s_tip, cut.kerf_tip))
     ]
@@ -145,7 +187,7 @@ def panel_ends(design: Design, panel: int) -> PanelEnds:
         events[side] = _nest(sorted(events[side], key=lambda e: e.a[0]), side)
 
     n = cut.points_per_surface
-    loops, nominals, skins, shapes = [], [], [], []
+    loops, nominals, skins, shapes, local = [], [], [], [], []
     for k, end in enumerate(ends):
         upper, up_marks = _sample(end, "upper", events["upper"], k, n, cut.le_clustering)
         lower, lo_marks = _sample(end, "lower", events["lower"], k, n, cut.le_clustering)
@@ -160,6 +202,17 @@ def panel_ends(design: Design, panel: int) -> PanelEnds:
         lo_final = _insert(lo_off, lo_marks, events["lower"], end, k, "lower")
         loop = np.vstack([up_final[::-1], lo_final[1:]])
         loops.append((_place(loop, end), len(up_final) - 1))
+        xs = airfoil.stations(300, 1.0)
+        raw_u, raw_l = end.surf.upper(xs) * end.chord, end.surf.lower(xs) * end.chord
+        local.append({
+            "chord": end.chord,
+            "kerf": end.kerf,
+            "raw": np.vstack([np.column_stack([xs, raw_u])[::-1], np.column_stack([xs, raw_l])[1:]]) * [end.chord, 1.0],
+            "nominal": base,
+            "cut": loop,
+            "te_start": end.x_te * end.chord if end.te_min > 0 and end.x_te < 1.0 else None,
+            "thick_at": end.x_thick * end.chord,
+        })
 
         x = airfoil.stations(300, 1.0)
         skins.append(tuple(np.column_stack([x * end.chord, end.skin(side, x)]) for side in ("upper", "lower")))
@@ -177,6 +230,7 @@ def panel_ends(design: Design, panel: int) -> PanelEnds:
         nominal_le=n_le,
         skins=skins,
         shapes=shapes,
+        local=local,
     )
 
 

@@ -10,8 +10,8 @@ spanwise position of a section is its distance from the wing root.
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field, fields
-from typing import Any
+from dataclasses import asdict, dataclass, field, fields, replace
+from typing import Any, ClassVar
 
 FORMAT_VERSION = 1
 
@@ -58,8 +58,24 @@ class Block:
     machine_y: float = 0.0  # block bottom above program zero along Y; 0 puts program zero on the bottom
 
 
+class _PerEnd:
+    """A feature whose size and place can differ at the root and tip end of each panel.
+
+    With ``advanced`` off, the plain fields apply at both ends. With it on, they set the
+    root end and the ``tip_`` copies of the fields named in ``END_FIELDS`` set the tip end.
+    """
+
+    END_FIELDS: ClassVar[tuple[str, ...]] = ()
+
+    def at(self, k: int):
+        """This feature at the panel root (k = 0) or tip (k = 1)."""
+        if not (self.advanced and k == 1):
+            return self
+        return replace(self, **{name: getattr(self, "tip_" + name) for name in self.END_FIELDS})
+
+
 @dataclass
-class Spar:
+class Spar(_PerEnd):
     """A spar cut that runs the length of the panel.
 
     ``rect`` and ``u`` are open slots cut into the wing from ``surface``. ``round`` is
@@ -76,10 +92,20 @@ class Spar:
     diameter: float = 6.0  # tube diameter (round)
     y_offset: float = 0.0  # tube centre above the camber line (round)
     panels: list[int] = field(default_factory=list)  # empty means every panel
+    advanced: bool = False  # see _PerEnd
+    # round: when the entry slit is longer at one end, the other end first runs out into the
+    # scrap and back so both ends cut the slit at the same speed (CutSettings.entry_match_min)
+    match_entry: bool = True
+    tip_x_c: float = 0.3
+    tip_width: float = 6.0
+    tip_depth: float = 6.0
+    tip_diameter: float = 6.0
+    tip_y_offset: float = 0.0
+    END_FIELDS: ClassVar[tuple[str, ...]] = ("x_c", "width", "depth", "diameter", "y_offset")
 
 
 @dataclass
-class Hole:
+class Hole(_PerEnd):
     """A round lightening hole reached through a thin entry slit from ``surface``."""
 
     enabled: bool = True
@@ -88,10 +114,16 @@ class Hole:
     y_offset: float = 0.0  # centre above the camber line
     surface: str = "lower"
     panels: list[int] = field(default_factory=list)
+    advanced: bool = False  # see _PerEnd
+    match_entry: bool = True  # as Spar.match_entry
+    tip_x_c: float = 0.5
+    tip_diameter: float = 10.0
+    tip_y_offset: float = 0.0
+    END_FIELDS: ClassVar[tuple[str, ...]] = ("x_c", "diameter", "y_offset")
 
 
 @dataclass
-class ControlCut:
+class ControlCut(_PerEnd):
     """Separates a control surface along its hinge line.
 
     The wire cuts from ``surface`` through to the opposite surface and back. A
@@ -105,15 +137,19 @@ class ControlCut:
     gap: float = 0.0
     surface: str = "lower"
     panels: list[int] = field(default_factory=list)
+    advanced: bool = False  # see _PerEnd
+    tip_hinge_x_c: float = 0.75
+    tip_gap: float = 0.0
+    END_FIELDS: ClassVar[tuple[str, ...]] = ("hinge_x_c", "gap")
 
 
 @dataclass
 class CutSettings:
     heat_control: bool = False  # write heat on/off codes into the file
     heat_dwell_s: float = 0.0  # pause after heat-on so the wire reaches temperature
-    # cutting speed, mm/min. 85 is what F120 gives each carriage on the ME 415 machine, which
-    # applies F over all four axes; it is the speed the calibration blocks were cut at
-    feed: float = 85.0
+    # cutting speed, mm/min. The calibration blocks 1 and 2 were cut at 85 (F120 on the ME 415
+    # machine, which applies F over all four axes)
+    feed: float = 120.0
     feed_basis: str = "faster_carriage"  # root | tip | faster_carriage | slower_carriage
     exit_feed: float = 170.0  # mm/min, the move back out of the block (F240 on the ME 415 machine)
     entry: str = "trailing"  # trailing | leading: which edge the wire reaches first
@@ -125,6 +161,8 @@ class CutSettings:
     # but over no more than the last te_extent of the chord (a fraction; 1 means no limit; default 5%)
     te_min_thickness: float = 1.0
     te_extent: float = 0.05
+    # mm; a round spar's or hole's entry slit is evened out at the two ends when they differ by more than this
+    entry_match_min: float = 1.0
     thicken_surface: str = "both"  # which surface moves out to add thickness: lower | upper | both (half each)
     points_per_surface: int = 80
     le_clustering: float = 1.25  # 1 = light, 1.25 = medium, 1.5 = strong; see airfoil.stations
@@ -179,6 +217,8 @@ class Design:
             raise ValueError("minimum thicknesses can't be negative")
         if self.cut.thicken_surface not in ("lower", "upper", "both"):
             raise ValueError("added thickness goes on the lower surface, the upper surface, or both")
+        if self.cut.entry_match_min < 0:
+            raise ValueError("the entry-slit difference to even out can't be negative")
         if not 0.0 <= self.cut.te_extent <= 1.0:
             raise ValueError("the trailing-edge thickness must cover between 0 and 100% of the chord")
         if not 10 <= self.cut.points_per_surface <= 400:

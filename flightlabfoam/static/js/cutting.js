@@ -28,6 +28,7 @@ function renderCutting() {
       ['leading', 'Leading edge first'],
     ], () => c.entry, v => { c.entry = v; }, ch)),
     checkField('Write a comment header describing the cut', checkInput(() => c.comment_header, v => { c.comment_header = v; }, ch)),
+    field('Even out spar and hole entry slits that differ by more than', n('entry_match_min', 'len', { min: 0 }), 'len'),
 
     h('h3', {}, 'Kerf'),
     field('Kerf offset at the root', n('kerf_root', 'len', { min: 0 }, kerfWarning), 'len'),

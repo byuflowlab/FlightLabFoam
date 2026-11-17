@@ -198,3 +198,80 @@ def test_added_thickness_goes_on_the_chosen_surface(add_to, up_share):
     np.testing.assert_allclose(lo0 - end.skin("lower", x), (1 - up_share) * added, atol=1e-9)
     tail = x > end.x_te
     np.testing.assert_allclose((end.skin("upper", x) - end.skin("lower", x))[tail], 2.0)
+
+
+@pytest.mark.parametrize(
+    "spar",
+    [Spar(kind="rect", x_c=0.3, width=4.0, depth=3.0), Spar(kind="u", x_c=0.3, width=4.0, depth=3.0), Spar(kind="round", x_c=0.3, diameter=4.0)],
+)
+def test_a_kerf_bigger_than_the_spar_closes_it_without_inverting(spar):
+    from dataclasses import replace
+
+    from flightlabfoam.geometry import _Event, _excursion
+
+    end, _ = _end("naca0012", 200.0, 0.0, 0.0)
+    half = 2.0 / 200.0
+    e = _Event((0.3 - half, 0.3 - half), (0.3 + half, 0.3 + half), spar, "spar")
+    anchor = (0.3 * 200.0, end.skin("lower", 0.3))
+
+    def cut(kerf):
+        return np.array(_excursion(e, anchor, replace(end, kerf=kerf), 0, "lower"), dtype=float)
+
+    assert np.allclose(cut(2.0)[:, 0], 0.3 * 200.0, atol=1e-9)  # zero width once the kerf is half of it
+    closed = cut(3.0)  # and zero depth once the kerf reaches the slot depth
+    for kerf in (4.0, 6.0):
+        assert np.allclose(cut(kerf), closed)  # stays closed as the kerf grows
+
+
+def test_advanced_spar_sets_the_root_and_tip_separately(design):
+    design.spars = [Spar(kind="rect", x_c=0.3, width=8.0, depth=5.0, advanced=True, tip_x_c=0.4, tip_width=4.0, tip_depth=5.0)]
+    ends = panel_ends(design, 0)
+    assert ends.root.shape == ends.tip.shape
+    for k, (xc, w) in enumerate(((0.3, 8.0), (0.4, 4.0))):
+        sec = design.sections[k]
+        outline = ends.shapes[k][0].points
+        assert outline[:, 0].min() == pytest.approx(xc * sec.chord - w / 2)
+        assert outline[:, 0].max() == pytest.approx(xc * sec.chord + w / 2)
+    # unticked, the tip fields are ignored
+    design.spars[0].advanced = False
+    plain = panel_ends(design, 0)
+    assert plain.shapes[1][0].points[:, 0].min() == pytest.approx(0.3 * design.sections[1].chord - 4.0)
+
+
+def test_advanced_hole_and_control_cut_set_the_root_and_tip_separately(design):
+    design.holes = [Hole(x_c=0.5, diameter=8.0, advanced=True, tip_x_c=0.45, tip_diameter=4.0)]
+    design.control_cuts = [ControlCut(enabled=True, hinge_x_c=0.75, gap=4.0, advanced=True, tip_hinge_x_c=0.8, tip_gap=2.0)]
+    ends = panel_ends(design, 0)
+    assert ends.root.shape == ends.tip.shape
+    for k, (xh, dia, hinge) in enumerate(((0.5, 8.0, 0.75), (0.45, 4.0, 0.8))):
+        c = design.sections[k].chord
+        shapes = {s.kind: s.points for s in ends.shapes[k]}
+        hole, cut = shapes["hole"], shapes["cut"]
+        assert np.ptp(hole[:, 0]) == pytest.approx(dia, rel=1e-3)
+        assert hole[:, 0].mean() == pytest.approx(xh * c, abs=0.05)
+        assert cut[1, 0] == pytest.approx(hinge * c)
+
+
+@pytest.mark.parametrize("feature", [Spar(kind="round", x_c=0.3, diameter=6.0), Hole(x_c=0.4, diameter=6.0)])
+def test_unequal_entry_slits_are_cut_at_the_same_speed(tapered, feature):
+    from flightlabfoam.geometry import ARC_POINTS
+
+    tapered.sections[1].chord = 60.0  # a much thinner tip, so its slit is much shorter
+    (tapered.spars if isinstance(feature, Spar) else tapered.holes).append(feature)
+
+    def slit_segments(loop):
+        for i in range(4, len(loop) - ARC_POINTS):
+            if np.allclose(loop[i], loop[i + ARC_POINTS]) and np.linalg.norm(loop[i + 1] - loop[i]) < 1:
+                seg = np.linalg.norm(np.diff(loop[i - 3 : i + ARC_POINTS + 4], axis=0), axis=1)
+                return np.concatenate([seg[:3], seg[-3:]])
+        raise AssertionError("no hole found")
+
+    ends = panel_ends(tapered, 0)
+    root, tip = slit_segments(ends.root), slit_segments(ends.tip)
+    assert np.allclose(root, tip, rtol=0.02)  # the same lengths, so the same speed at both ends
+    feature.match_entry = False
+    ends = panel_ends(tapered, 0)
+    assert not np.allclose(slit_segments(ends.root), slit_segments(ends.tip), rtol=0.02)
+    feature.match_entry = True
+    tapered.cut.entry_match_min = 50.0  # a difference below the limit is left alone
+    assert len(panel_ends(tapered, 0).root) == len(ends.root)

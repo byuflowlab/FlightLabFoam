@@ -40,6 +40,7 @@ function renderSettings() {
     n('min_wall_thickness', 'Minimum foam wall', 'len'),
     n('min_te_thickness', 'Minimum trailing edge', 'len'),
     n('max_te_thickness', 'Maximum trailing edge', 'len'),
+    n('exit_clearance', 'Back away from the foam after the cut', 'len'),
     t('heat_on_code', 'Heat on code'),
     t('heat_off_code', 'Heat off code'),
     h('p', { class: 'hint', style: 'grid-column: 1 / -1' },

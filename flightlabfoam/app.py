@@ -201,6 +201,8 @@ def _panel_json(design: Design, settings, panel: int, side: str) -> dict:
         "face_tip": _round(tp.face_tip + [b.machine_x, b.machine_y]),
         "nominal_root": _round(pl.to_machine(tp.ends.nominal_root)),
         "nominal_tip": _round(pl.to_machine(tp.ends.nominal_tip)),
+        "part_root": _round(pl.to_machine(tp.ends.part_root)),
+        "part_tip": _round(pl.to_machine(tp.ends.part_tip)),
         "block": {"span": b.span, "chord": b.chord, "thickness": b.thickness, "cut_in": b.cut_in, "x": b.machine_x, "y": b.machine_y},
         "w_root": pl.w_root,
         "w_tip": pl.w_tip,

@@ -24,7 +24,8 @@ def test_straight_panel_carriages_match_and_lead_in(design, settings):
     tp = toolpath.build(design, settings, 0)
     assert np.allclose(tp.xy, tp.az)
     assert tp.kind[0] == "start" and tp.kind[-1] == "exit"
-    assert tp.xy[0, 0] == 0.0 and tp.xy[-1, 0] == 0.0
+    assert tp.xy[0, 0] == 0.0 and tp.xy[-2, 0] == 0.0
+    assert tp.xy[-1, 0] == -settings.machine.exit_clearance  # backs away from the foam at the end
     assert tp.xy[1, 0] == pytest.approx(design.block(0).cut_in)  # first contact
     assert tp.xy[1, 1] == pytest.approx(tp.xy[0, 1])  # horizontal lead-in
     assert tp.xy[2, 1] > tp.xy[1, 1]  # leading edge first, upper surface first
@@ -99,12 +100,12 @@ def test_block_position_shifts_the_cut_and_adds_an_approach(design, settings):
     base = toolpath.build(design, settings, 0)
     design.blocks = [type(design.block(0))(machine_x=50.0, machine_y=20.0)]
     moved = toolpath.build(design, settings, 0)
-    assert len(moved.xy) == len(base.xy) + 2
+    assert len(moved.xy) == len(base.xy) + 1
     # up from program zero, across to the entry face, then the same cut shifted by (50, 20)
     assert np.allclose(moved.xy[0], [0.0, base.xy[0, 1] + 20.0])
     assert np.allclose(moved.xy[1], [50.0, base.xy[0, 1] + 20.0])
-    assert np.allclose(moved.xy[1:-1], base.xy + [50.0, 20.0])
-    assert np.allclose(moved.xy[-1], moved.xy[0])
+    assert np.allclose(moved.xy[1:-1], base.xy[:-1] + [50.0, 20.0])
+    assert np.allclose(moved.xy[-1], moved.xy[0])  # 50 mm out is already past the 5 mm back-off
     assert moved.kind[-2:] == ["exit", "exit"]
     # the block-frame faces do not move
     assert np.allclose(moved.face_root, base.face_root)
@@ -126,3 +127,13 @@ def test_exit_holds_the_faster_carriage_at_the_exit_speed(design, settings):
     exits = np.array([k == "exit" for k in tp.kind]) & (fast > 1e-6)
     assert exits.any()
     assert np.allclose(fast[exits] / (tp.seconds[exits] / 60), design.cut.exit_feed)
+
+
+def test_the_wire_backs_away_from_the_foam_without_a_warning(design, settings):
+    from flightlabfoam.checks import check
+
+    settings.machine.exit_clearance = 8.0
+    tp = toolpath.build(design, settings, 0)
+    assert tp.kind[-1] == "exit" and tp.xy[-1, 0] == -8.0 and tp.az[-1, 0] == -8.0
+    assert np.allclose(tp.xy[-1, 1], tp.xy[-2, 1])  # straight back, level
+    assert not any("behind program zero" in c["message"] for c in check(tp, design, settings))

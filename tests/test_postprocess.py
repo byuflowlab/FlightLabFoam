@@ -61,7 +61,8 @@ def test_real_panel_file_is_well_formed(design, settings):
     assert len(moves) == len(tp.xy)
     assert all(" " not in m for m in moves)
     # straight panel with the xy feed model: F on the first move and on the exit only
-    assert [m for m in moves if "F" in m] == [moves[0], moves[-1]]
+    assert [m for m in moves if "F" in m] == [moves[0], moves[-2]]
+    assert moves[-1].startswith("G1X-5.0000")  # backing away from the foam, at the exit feed
     assert "G0" not in text.replace("G01", "") and "%" not in text and "M30" not in text
 
 

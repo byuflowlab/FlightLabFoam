@@ -28,7 +28,7 @@ the leading edge, then along the lower surface to the trailing edge (lower).
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 import numpy as np
 
@@ -63,6 +63,9 @@ class PanelEnds:
     nominal_root: np.ndarray  # airfoil outline without kerf or features, for drawing
     nominal_tip: np.ndarray
     nominal_le: int  # leading-edge index of the nominal outlines
+    # the finished part at each end: the outline with every feature at its own size, no kerf, for drawing
+    part_root: np.ndarray | None = None
+    part_tip: np.ndarray | None = None
     skins: list[tuple[np.ndarray, np.ndarray]] = field(default_factory=list)  # per end: (upper, lower), section frame
     shapes: list[list[Shape]] = field(default_factory=list)  # per end: every feature's nominal outline
     # per end, in the section frame (leading edge at the origin, untwisted, mm): the airfoil as
@@ -150,6 +153,8 @@ class _Event:
     feature: object
     label: str
     children: list["_Event"] = field(default_factory=list)  # cuts that start from this slot's floor
+    # (root, tip) entry-slit lengths, mm, set when they differ enough to be evened out (see _excursion)
+    entry: tuple[float, float] | None = None
 
     @property
     def slit(self) -> bool:
@@ -187,21 +192,31 @@ def panel_ends(design: Design, panel: int) -> PanelEnds:
         events[side] = _nest(sorted(events[side], key=lambda e: e.a[0]), side)
 
     n = cut.points_per_surface
-    loops, nominals, skins, shapes, local = [], [], [], [], []
+    sampled = []
     for k, end in enumerate(ends):
         upper, up_marks = _sample(end, "upper", events["upper"], k, n, cut.le_clustering)
         lower, lo_marks = _sample(end, "lower", events["lower"], k, n, cut.le_clustering)
         base = np.vstack([upper[::-1], lower[1:]])
-        nominals.append(_place(base, end))
         off = _offset(base, end.kerf)
         m_u = len(upper)
+        surfaces = {"upper": (off[:m_u][::-1], up_marks), "lower": (off[m_u - 1 :], lo_marks)}
+        sampled.append((upper, up_marks, lower, lo_marks, base, m_u, surfaces))
+    _match_entries(events, ends, [s[-1] for s in sampled], cut.entry_match_min)
+
+    loops, nominals, parts, skins, shapes, local = [], [], [], [], [], []
+    for k, end in enumerate(ends):
+        upper, up_marks, lower, lo_marks, base, m_u, surfaces = sampled[k]
+        nominals.append(_place(base, end))
         n_le = m_u - 1
-        up_off = off[:m_u][::-1]
-        lo_off = off[m_u - 1 :]
+        up_off, lo_off = surfaces["upper"][0], surfaces["lower"][0]
         up_final = _insert(up_off, up_marks, events["upper"], end, k, "upper")
         lo_final = _insert(lo_off, lo_marks, events["lower"], end, k, "lower")
         loop = np.vstack([up_final[::-1], lo_final[1:]])
         loops.append((_place(loop, end), len(up_final) - 1))
+        bare = replace(end, kerf=0.0)  # the same cuts without the kerf: the part as it should come out
+        part_u = _insert(upper, up_marks, events["upper"], bare, k, "upper", detour=False)
+        part_l = _insert(lower, lo_marks, events["lower"], bare, k, "lower", detour=False)
+        parts.append(_place(np.vstack([part_u[::-1], part_l[1:]]), end))
         xs = airfoil.stations(300, 1.0)
         raw_u, raw_l = end.surf.upper(xs) * end.chord, end.surf.lower(xs) * end.chord
         local.append({
@@ -227,6 +242,8 @@ def panel_ends(design: Design, panel: int) -> PanelEnds:
         span=s_tip.span_pos - s_root.span_pos,
         nominal_root=nominals[0],
         nominal_tip=nominals[1],
+        part_root=parts[0],
+        part_tip=parts[1],
         nominal_le=n_le,
         skins=skins,
         shapes=shapes,
@@ -257,11 +274,16 @@ def _labels(design: Design) -> dict:
     return out
 
 
-def _event(f, ends: list[_End], label: str) -> _Event:
+def _at(f, k: int):
+    """A feature as it is at panel end ``k``: an advanced feature can differ at the root and tip."""
+    return f.at(k)
+
+
+def _event(f0, ends: list[_End], label: str) -> _Event:
     """Chord-fraction boundaries of a feature at the root and the tip."""
     a, b = [], []
-    for end in ends:
-        c = end.chord
+    for k, end in enumerate(ends):
+        f, c = _at(f0, k), end.chord
         if isinstance(f, Spar) and f.kind in ("rect", "u"):
             lo, hi = f.x_c - f.width / (2 * c), f.x_c + f.width / (2 * c)
         elif isinstance(f, ControlCut):
@@ -272,7 +294,7 @@ def _event(f, ends: list[_End], label: str) -> _Event:
             raise ValueError(f"the {label} at x/c = {f.x_c if not isinstance(f, ControlCut) else f.hinge_x_c:g} runs off the airfoil")
         a.append(lo)
         b.append(hi)
-    return _Event(tuple(a), tuple(b), f, label)
+    return _Event(tuple(a), tuple(b), f0, label)
 
 
 def _nest(events: list[_Event], side: str) -> list[_Event]:
@@ -380,24 +402,29 @@ def _offset(loop: np.ndarray, d: float) -> np.ndarray:
     return loop + d * bis / cos[:, None]
 
 
-def _insert(surface, marks, events, end: _End, k: int, side: str) -> np.ndarray:
+def _insert(surface, marks, events, end: _End, k: int, side: str, detour: bool = True) -> np.ndarray:
     """Insert each event's cut after its start station on a LE -> TE surface."""
     pieces, last = [], 0
     for mark, e in zip(marks, events):
         pieces.append(surface[last : mark + 1])
         anchor = surface[mark]
-        pieces.append(np.asarray(_excursion(e, anchor, end, k, side), dtype=float).reshape(-1, 2))
+        pieces.append(np.asarray(_excursion(e, anchor, end, k, side, detour), dtype=float).reshape(-1, 2))
         last = mark + 1
     pieces.append(surface[last:])
     return np.vstack(pieces)
 
 
 def _slot_frame(e: _Event, end: _End, k: int, side: str, kerf: float):
-    """Walls, floor height and U radius of a slot; kerf moves the walls and floor inward."""
-    f, c = e.feature, end.chord
+    """Walls, floor height and U radius of a slot; kerf moves the walls and floor inward.
+
+    A kerf larger than the slot closes it to zero width or depth rather than turning it inside out.
+    """
+    f, c = _at(e.feature, k), end.chord
     s_in = -1.0 if side == "upper" else 1.0
-    xa, xb = e.a[k] * c + kerf, e.b[k] * c - kerf
-    floor = end.skin(side, f.x_c) + s_in * (f.depth - kerf)
+    a, b = e.a[k] * c, e.b[k] * c
+    inset = min(kerf, max(b - a, 0.0) / 2)
+    xa, xb = a + inset, b - inset
+    floor = end.skin(side, f.x_c) + s_in * max(f.depth - kerf, 0.0)
     r = (xb - xa) / 2
     return xa, xb, floor, r, s_in
 
@@ -410,7 +437,7 @@ def _circle(f, end: _End, side: str, kerf: float, n: int = ARC_POINTS) -> np.nda
     """
     s_in = -1.0 if side == "upper" else 1.0
     c = end.chord
-    r = f.diameter / 2 - kerf
+    r = max(f.diameter / 2 - kerf, 0.0)  # a kerf bigger than the hole closes it, never inverts it
     xc = f.x_c * c
     yc = 0.5 * (end.surf.upper(f.x_c) + end.surf.lower(f.x_c)) * c + f.y_offset
     theta = -s_in * np.pi / 2 - s_in * 2 * np.pi * np.arange(0, n + 1) / n
@@ -419,14 +446,14 @@ def _circle(f, end: _End, side: str, kerf: float, n: int = ARC_POINTS) -> np.nda
     return pts
 
 
-def _excursion(e: _Event, anchor, end: _End, k: int, side: str):
+def _excursion(e: _Event, anchor, end: _End, k: int, side: str, detour: bool = True):
     """Points of a feature cut, in LE -> TE order, between its start and end stations.
 
     ``s_in`` points into the wing from the entry surface. Every cut is drawn so that
     wing material stays on the same side of the wire as along the outline, so the
     kerf compensation shrinks slots and holes (the wire widens them back).
     """
-    f, c, kerf = e.feature, end.chord, end.kerf
+    f, c, kerf = _at(e.feature, k), end.chord, end.kerf
     other = "lower" if side == "upper" else "upper"
     s_in = -1.0 if side == "upper" else 1.0
 
@@ -439,7 +466,7 @@ def _excursion(e: _Event, anchor, end: _End, k: int, side: str):
             pts = [(xa, top), (xa, floor)]
             for ch in e.children:
                 foot = (ch.a[k] * c, floor)
-                pts += [foot, *_excursion(ch, foot, end, k, side)]
+                pts += [foot, *_excursion(ch, foot, end, k, side, detour)]
                 if not ch.slit:
                     pts.append((ch.b[k] * c, floor))
             return pts + [(xb, floor), (xb, top)]
@@ -448,6 +475,8 @@ def _excursion(e: _Event, anchor, end: _End, k: int, side: str):
         yc = floor - s_in * r
 
         def arc_t(x):
+            if r <= 0:  # slot closed up by the kerf
+                return 0.0
             return float(np.arccos(np.clip((xc - x) / r, -1.0, 1.0)) / np.pi)
 
         def arc(t0, t1, include_end):
@@ -460,7 +489,7 @@ def _excursion(e: _Event, anchor, end: _End, k: int, side: str):
             t_a = arc_t(ch.a[k] * c)
             pts += arc(t_prev, t_a, True)
             foot = pts[-1]
-            pts += _excursion(ch, foot, end, k, side)
+            pts += _excursion(ch, foot, end, k, side, detour)
             t_prev = t_a
             if not ch.slit:
                 t_prev = arc_t(ch.b[k] * c)
@@ -473,12 +502,47 @@ def _excursion(e: _Event, anchor, end: _End, k: int, side: str):
         return [apex] if not e.slit else [apex, tuple(anchor)]
 
     # round spar or lightening hole: entry slit from the surface, then a full circle
-    return [*map(tuple, _circle(f, end, side, kerf)), tuple(anchor)]
+    circle = [*map(tuple, _circle(f, end, side, kerf))]
+    if not (detour and e.entry):
+        return [*circle, tuple(anchor)]
+    # The root and tip slits differ in length, so with the ends matched point for point the
+    # shorter one would crawl and melt more. It first runs out of the part into the scrap by
+    # half the difference and back, while the longer one starts down its slit, so both ends
+    # then cut the rest of the slit, and come back out, at the same speed.
+    a = np.asarray(anchor, dtype=float)
+    out = a - np.asarray(circle[0])
+    u = out / max(float(np.linalg.norm(out)), 1e-12)  # out of the part along the slit
+    ext = abs(e.entry[0] - e.entry[1]) / 2
+    if e.entry[k] < e.entry[1 - k]:
+        into, back = [a + u * ext, a], [a, a + u * ext]
+    else:
+        into, back = [a - u * ext, a - 2 * u * ext], [a - 2 * u * ext, a - u * ext]
+    return [*map(tuple, into), *circle, *map(tuple, back), tuple(anchor)]
+
+
+def _match_entries(events: dict, ends: list[_End], surfaces: list[dict], min_diff: float) -> None:
+    """Mark round spars and holes whose entry slits differ by more than ``min_diff`` at the two ends.
+
+    ``surfaces[k][side]`` is that end's kerf-offset surface and the station of each event on it.
+    Cuts that start from a slot floor are left as they are.
+    """
+    for side, top in events.items():
+        for i, e in enumerate(top):
+            f = e.feature
+            if e.is_slot or isinstance(f, ControlCut) or not getattr(f, "match_entry", True):
+                continue
+            lengths = []
+            for k, end in enumerate(ends):
+                surface, marks = surfaces[k][side]
+                start = _circle(_at(f, k), end, side, end.kerf)[0]
+                lengths.append(float(np.linalg.norm(surface[marks[i]] - start)))
+            if abs(lengths[0] - lengths[1]) > min_diff:
+                e.entry = (lengths[0], lengths[1])
 
 
 def _shape(e: _Event, end: _End, k: int, side: str) -> Shape:
     """The nominal (no kerf) outline of a feature at one end, for the fit checks."""
-    f, c = e.feature, end.chord
+    f, c = _at(e.feature, k), end.chord
     if e.is_slot:
         xa, xb, floor, r, s_in = _slot_frame(e, end, k, side, 0.0)
         mouth = np.linspace(xb, xa, 25)  # along the entry surface, closing the outline

@@ -50,9 +50,11 @@ def check(tp: Toolpath, design: Design, settings: Settings) -> list[dict]:
     if faces[:, 1].max() > b.thickness + _TOL:
         error(f"the panel extends {faces[:, 1].max() - b.thickness:.1f} mm above the block; lower it or use thicker foam")
 
+    # the back-off at the end goes behind program zero on purpose, so it is left out here
+    before_exit = np.array([k != "exit" for k in tp.kind])
     for name, pts, h, v in (("X/Y", tp.xy, "X", "Y"), ("A/Z", tp.az, "A", "Z")):
-        if pts[:, 0].min() < -_TOL:
-            warn(f"the {name} carriage goes to {h} = {pts[:, 0].min():.1f} mm, behind program zero")
+        if pts[before_exit, 0].min() < -_TOL:
+            warn(f"the {name} carriage goes to {h} = {pts[before_exit, 0].min():.1f} mm, behind program zero")
         if pts[:, 0].max() > m.travel_horizontal + _TOL:
             error(f"the {name} carriage needs {h} = {pts[:, 0].max():.1f} mm but travels only {m.travel_horizontal:g} mm")
         low = float(pts[:, 1].min())

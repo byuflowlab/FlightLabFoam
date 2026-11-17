@@ -80,24 +80,30 @@
     <section class="pane" data-pane="features" hidden>
       <div class="card">
         <h2>Spars</h2>
-        <p class="hint">Cuts on this page enter from the bottom of the wing unless you choose the top, so the top surface stays clean. Square and U spars are open slots cut in from that surface. Round spars are tubes, reached through a thin entry slit. Positions are fractions of the local chord, so a spar follows the taper; sizes are the same at both ends.</p>
+        <p class="hint">Cuts on this page enter from the bottom of the wing unless you choose the top, so the top surface stays clean. Square and U spars are open slots cut in from that surface. Round spars are tubes, reached through a thin entry slit. Positions are fractions of the local chord, so a spar follows the taper; sizes are the same at both ends. Tick Advanced to set a spar's position and size separately at the root and tip end of each panel it runs through. When a round spar's entry slit is longer at one end, the shorter end first runs out into the scrap and back, so both ends cut the slit at the same speed; the difference that triggers this is on the Cutting settings page, and Advanced has a switch to turn it off.</p>
         <div class="table-wrap"><table class="grid" id="spars-table"></table></div>
         <button class="btn ghost" id="add-spar">Add spar</button>
       </div>
       <div class="card">
         <h2>Lightening holes</h2>
-        <p class="hint">A hot wire cannot start inside the foam, so each hole is reached through a thin slit, from the bottom unless you choose the top.</p>
+        <p class="hint">A hot wire cannot start inside the foam, so each hole is reached through a thin slit, from the bottom unless you choose the top. Tick Advanced to set a hole's position and size separately at the root and tip end of each panel it runs through. Entry slits are evened out as for round spars.</p>
         <div class="table-wrap"><table class="grid" id="holes-table"></table></div>
         <button class="btn ghost" id="add-hole">Add hole</button>
       </div>
       <div class="card">
         <h2>Control surfaces</h2>
-        <p class="hint">Cuts through the wing along the hinge line and back, separating the aileron or elevator. A gap makes the cut a V that opens toward the entry surface, leaving room to deflect. A cut runs the full length of each panel it applies to.</p>
+        <p class="hint">Cuts through the wing along the hinge line and back, separating the aileron or elevator. A gap makes the cut a V that opens toward the entry surface, leaving room to deflect. A cut runs the full length of each panel it applies to. Tick Advanced to set the hinge and gap separately at the root and tip end of each panel.</p>
         <div class="table-wrap"><table class="grid" id="controls-table"></table></div>
         <button class="btn ghost" id="add-control">Add control-surface cut</button>
       </div>
       <div class="card view-card">
+        <div class="view-tabs" id="features-view-tabs">
+          <button data-view="both" class="on">Root and tip</button>
+          <button data-view="root">Root</button>
+          <button data-view="tip">Tip</button>
+        </div>
         <div class="view" id="features-view"></div>
+        <p class="hint">Shaded with a dashed edge: the finished part, with every spar, hole and control cut at the size you set. Solid line: the path the wire follows, offset by the kerf outside the part, so it runs inside each hole and slot. The wire melts away the kerf on each side, which brings the cut back to the part.</p>
       </div>
     </section>
 

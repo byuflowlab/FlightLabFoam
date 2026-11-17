@@ -45,6 +45,8 @@ class Machine:
     min_te_thickness: float = 1.0
     # mm; a thicker trailing edge is flagged too, since it starts to look blunt
     max_te_thickness: float = 2.0
+    # mm; at the end the wire backs away from the entry face by at least this much, clear of the foam
+    exit_clearance: float = 5.0
     heat_on_code: str = "M3"
     heat_off_code: str = "M5"
 
@@ -70,6 +72,8 @@ class Settings:
         if self.units not in ("mm", "in"):
             raise ValueError("units must be mm or in")
         m = self.machine
+        if m.exit_clearance < 0:
+            raise ValueError("the back-off after the cut can't be negative")
         if m.carriage_separation <= 0:
             raise ValueError("carriage separation must be positive")
         if m.xy_carriage_side not in ("left", "right"):

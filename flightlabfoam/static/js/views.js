@@ -65,9 +65,12 @@ function dimension(m, p, q, text) {
 
 const ZERO_LINE = 'stroke:var(--muted);stroke-dasharray:2 4';
 
+// items: [colour, text, style]; style true draws a dashed line, 'area' a shaded box with a dashed edge
 function legend(items) {
-  return h('div', { class: 'legend' }, items.map(([color, text, dashed]) =>
-    h('span', {}, h('i', { style: `background:${dashed ? 'transparent' : color};border-top:${dashed ? `2px dashed ${color}` : '0'}` }), text)));
+  const swatch = (color, style) => style === 'area'
+    ? `width:14px;height:10px;border-radius:2px;border:1px dashed ${color};background:color-mix(in srgb, ${color} 18%, transparent)`
+    : `background:${style ? 'transparent' : color};border-top:${style ? `2px dashed ${color}` : '0'}`;
+  return h('div', { class: 'legend' }, items.map(([color, text, style]) => h('span', {}, h('i', { style: swatch(color, style) }), text)));
 }
 
 function emptyMessage(container, text) {

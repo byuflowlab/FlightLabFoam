@@ -143,11 +143,18 @@ def build(design: Design, settings: Settings, panel: int, side: str = "right") -
     root, tip = pl.to_machine(root), pl.to_machine(tip)
     x_face = pl.block.machine_x
 
+    # at the end the wire backs out past the entry face, away from the foam, by at least the
+    # machine's exit clearance (or to program zero, if that is further)
+    x_out = min(0.0, x_face - m.exit_clearance)
+
     def approach(y):
         return np.array([[0.0, y], [x_face, y]])
 
-    root = np.vstack([approach(root[0, 1]), root, approach(root[0, 1])[::-1]])
-    tip = np.vstack([approach(tip[0, 1]), tip, approach(tip[0, 1])[::-1]])
+    def leave(y):
+        return np.array([[x_face, y], [x_out, y]])
+
+    root = np.vstack([approach(root[0, 1]), root, leave(root[0, 1])])
+    tip = np.vstack([approach(tip[0, 1]), tip, leave(tip[0, 1])])
     kind = ["start", "start", "lead_in", *["cut"] * (len(order) - 1), "exit", "exit"]
 
     span = pl.w_tip - pl.w_root
